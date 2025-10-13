@@ -1,8 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
+import { Routes, ScreenProps } from "../root/index.types";
 
-export default function Home() {
+const Login: React.FC<ScreenProps<Routes.Login>> = () => {
   useEffect(() => {}, []);
 
   return (
@@ -11,7 +12,9 @@ export default function Home() {
       <StatusBar style="auto" />
     </View>
   );
-}
+};
+
+export default memo(Login);
 
 const styles = StyleSheet.create({
   container: {

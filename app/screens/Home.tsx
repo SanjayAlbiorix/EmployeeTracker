@@ -1,29 +1,9 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { memo } from "react";
+import { Routes, ScreenProps } from "../root/index.types";
+import NativeModuleUsage from "../native_modules/NativeModuleUsage";
 
-export default function Home() {
-  useEffect(() => {}, []);
+const Home: React.FC<ScreenProps<Routes.Home>> = () => {
+  return <NativeModuleUsage />;
+};
 
-  const navigation = useNavigation();
-
-  return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      {/* <Pressable onPress={() => navigation.navigate(Routes.Login)}>
-        <Text>Go to Login</Text>
-      </Pressable> */}
-      <Text>Welcome to the app!</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default memo(Home);

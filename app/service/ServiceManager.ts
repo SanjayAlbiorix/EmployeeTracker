@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
-import { localSystemStorage } from "../utils/LocalStorageProvider";
 import { store } from "../store";
 
 export const BaseHeader = {
