@@ -48,7 +48,8 @@
           "locationWhenInUsePermission": "Allow ReactNativeExpoApp to access your location while using the app.",
           "locationAlwaysAndWhenInUsePermission": "Allow ReactNativeExpoApp to access your location even when the app is closed."
         }
-      ]
+      ],
+      ["./plugins/with-simple-greeting"]
     ]
   }
 }
