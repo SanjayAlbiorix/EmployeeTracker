@@ -1,1 +1,0 @@
-export { getGreeting } from "./module";
