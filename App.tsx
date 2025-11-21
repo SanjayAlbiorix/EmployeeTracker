@@ -1,19 +1,25 @@
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "./app/store";
+import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import MainApp from "./app/root/MainApp";
+import { NavigationContainer } from "@react-navigation/native";
+import { ErrorBoundary } from "react-error-boundary";
+import { initStorage } from "./src/utils/storage";
+import AppNavigator from "./src/navigation/AppNavigator";
+import ErrorFallback from "./src/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 export default function App() {
+  useEffect(() => {
+    initStorage();
+  }, []);
+
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <QueryClientProvider client={queryClient}>
-          <MainApp />
-        </QueryClientProvider>
-      </PersistGate>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </ErrorBoundary>
+    </QueryClientProvider>
   );
 }

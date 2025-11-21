@@ -1,0 +1,1 @@
+import React from 'react'; import { View, Text, StyleSheet } from 'react-native'; import { useAuthStore } from '../../store/authStore'; export default function ProfileScreen(){ const user=useAuthStore(s=>s.user); return (<View style={{flex:1,padding:20}}><Text style={{fontSize:20,marginBottom:12}}>Profile</Text><Text>Email: {user?.email}</Text></View>); }
