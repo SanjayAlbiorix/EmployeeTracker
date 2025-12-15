@@ -1,25 +1,24 @@
-import React, { useEffect } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NavigationContainer } from "@react-navigation/native";
-import { ErrorBoundary } from "react-error-boundary";
-import { initStorage } from "./src/utils/storage";
-import AppNavigator from "./src/navigation/AppNavigator";
-import ErrorFallback from "./src/components/ErrorBoundary";
+import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { StatusBar } from 'expo-status-bar';
+import { colors } from './src/theme/colors';
+import { StyleSheet } from 'react-native';
 
-const queryClient = new QueryClient();
-
-export default function App() {
-  useEffect(() => {
-    initStorage();
-  }, []);
-
+const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </ErrorBoundary>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <StatusBar style="auto" />
+      <RootNavigator />
+    </GestureHandlerRootView>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+});
+
+export default App;
