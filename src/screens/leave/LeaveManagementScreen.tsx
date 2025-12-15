@@ -1,41 +1,23 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { ScreenContainer } from '../../components/layout/ScreenContainer';
 import { Section } from '../../components/layout/Section';
-import { AppHeader } from '../../components/common/AppHeader';
+import { PageHeader } from '../../components/common/PageHeader';
+import { StatusUpdateModal } from '../../components/common/StatusUpdateModal';
+import { AppButton } from '../../components/common/AppButton';
+import { AppText } from '../../components/common/AppText';
+import { StatusBadge } from '../../components/common/StatusBadge';
 import { EmptyState } from '../../components/common/EmptyState';
-import { mockLeaveRequests } from '../../data/mockData';
+import { useLeaveStore } from '../../store/useLeaveStore';
+import { LeaveRequest } from '../../types/models';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { shadows } from '../../theme/shadows';
-import { LeaveRequest } from '../../types/models';
 
-const getStatusColor = (status: LeaveRequest['status']) => {
-  switch (status) {
-    case 'approved':
-      return colors.success;
-    case 'pending':
-      return colors.warning;
-    case 'rejected':
-      return colors.error;
-    default:
-      return colors.textSecondary;
-  }
-};
-
-const getStatusLabel = (status: LeaveRequest['status']) => {
-  switch (status) {
-    case 'approved':
-      return 'Approved';
-    case 'pending':
-      return 'Pending';
-    case 'rejected':
-      return 'Rejected';
-    default:
-      return status;
-  }
-};
+interface LeaveCardProps {
+  leaveRequest: LeaveRequest;
+  onUpdateStatus: (leaveRequest: LeaveRequest) => void;
+}
 
 const getTypeLabel = (type: LeaveRequest['type']) => {
   switch (type) {
@@ -52,13 +34,7 @@ const getTypeLabel = (type: LeaveRequest['type']) => {
   }
 };
 
-interface LeaveCardProps {
-  leaveRequest: LeaveRequest;
-}
-
-const LeaveCard: React.FC<LeaveCardProps> = ({ leaveRequest }) => {
-  const statusColor = getStatusColor(leaveRequest.status);
-  const statusLabel = getStatusLabel(leaveRequest.status);
+const LeaveCard: React.FC<LeaveCardProps> = ({ leaveRequest, onUpdateStatus }) => {
   const typeLabel = getTypeLabel(leaveRequest.type);
 
   const formatDate = (dateString: string) => {
@@ -72,30 +48,46 @@ const LeaveCard: React.FC<LeaveCardProps> = ({ leaveRequest }) => {
   return (
     <View style={[styles.card, shadows.small]}>
       <View style={styles.cardHeader}>
-        <View>
-          <Text style={styles.employeeName}>{leaveRequest.employeeName}</Text>
-          <Text style={styles.leaveType}>{typeLabel}</Text>
+        <View style={styles.employeeInfo}>
+          <AppText variant="body" style={styles.employeeName}>
+            {leaveRequest.employeeName}
+          </AppText>
+          <AppText variant="caption" style={styles.leaveType}>
+            {typeLabel}
+          </AppText>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
-          <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
-        </View>
+        <StatusBadge status={leaveRequest.status} />
       </View>
 
       <View style={styles.dateRange}>
-        <Text style={styles.dateLabel}>
+        <AppText variant="bodySmall" style={styles.dateLabel}>
           {formatDate(leaveRequest.startDate)} - {formatDate(leaveRequest.endDate)}
-        </Text>
+        </AppText>
       </View>
 
       {leaveRequest.reason && (
-        <Text style={styles.reason}>{leaveRequest.reason}</Text>
+        <AppText variant="caption" style={styles.reason}>
+          {leaveRequest.reason}
+        </AppText>
       )}
+
+      <View style={styles.cardActions}>
+        <AppButton
+          title="Update Status"
+          onPress={() => onUpdateStatus(leaveRequest)}
+          variant="outline"
+          style={styles.updateButton}
+        />
+      </View>
     </View>
   );
 };
 
 export const LeaveManagementScreen: React.FC = () => {
-  const leaveRequests = mockLeaveRequests;
+  const leaveRequests = useLeaveStore((state) => state.leaveRequests);
+  const updateLeaveStatus = useLeaveStore((state) => state.updateLeaveStatus);
+  const [selectedLeave, setSelectedLeave] = useState<LeaveRequest | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const stats = useMemo(() => {
     return {
@@ -106,23 +98,57 @@ export const LeaveManagementScreen: React.FC = () => {
     };
   }, [leaveRequests]);
 
+  const handleUpdateStatus = (leaveRequest: LeaveRequest) => {
+    setSelectedLeave(leaveRequest);
+    setModalVisible(true);
+  };
+
+  const handleConfirmStatus = (status: LeaveRequest['status']) => {
+    if (selectedLeave) {
+      updateLeaveStatus(selectedLeave.id, status);
+    }
+    setSelectedLeave(null);
+    setModalVisible(false);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedLeave(null);
+  };
+
   return (
     <ScreenContainer scrollable={false}>
-      <AppHeader title="Leave Management" subtitle={`${stats.total} total requests`} />
+      <PageHeader
+        title="Leave Management"
+        subtitle={`${stats.total} total requests`}
+        sticky
+      />
 
       <Section marginBottom="md">
         <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { backgroundColor: colors.warning + '20' }]}>
-            <Text style={[styles.statValue, { color: colors.warning }]}>{stats.pending}</Text>
-            <Text style={styles.statLabel}>Pending</Text>
+          <View style={[styles.statCard, { backgroundColor: colors.warningSoft }]}>
+            <AppText variant="h2" style={[styles.statValue, { color: colors.warning }]}>
+              {stats.pending}
+            </AppText>
+            <AppText variant="label" style={styles.statLabel}>
+              Pending
+            </AppText>
           </View>
-          <View style={[styles.statCard, { backgroundColor: colors.success + '20' }]}>
-            <Text style={[styles.statValue, { color: colors.success }]}>{stats.approved}</Text>
-            <Text style={styles.statLabel}>Approved</Text>
+          <View style={[styles.statCard, { backgroundColor: colors.successSoft }]}>
+            <AppText variant="h2" style={[styles.statValue, { color: colors.success }]}>
+              {stats.approved}
+            </AppText>
+            <AppText variant="label" style={styles.statLabel}>
+              Approved
+            </AppText>
           </View>
-          <View style={[styles.statCard, { backgroundColor: colors.error + '20' }]}>
-            <Text style={[styles.statValue, { color: colors.error }]}>{stats.rejected}</Text>
-            <Text style={styles.statLabel}>Rejected</Text>
+          <View style={[styles.statCard, { backgroundColor: colors.errorSoft }]}>
+            <AppText variant="h2" style={[styles.statValue, { color: colors.error }]}>
+              {stats.rejected}
+            </AppText>
+            <AppText variant="label" style={styles.statLabel}>
+              Rejected
+            </AppText>
           </View>
         </View>
       </Section>
@@ -131,13 +157,25 @@ export const LeaveManagementScreen: React.FC = () => {
         <FlatList
           data={leaveRequests}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <LeaveCard leaveRequest={item} />}
+          renderItem={({ item }) => (
+            <LeaveCard leaveRequest={item} onUpdateStatus={handleUpdateStatus} />
+          )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <EmptyState title="No leave requests" message="Leave requests will appear here" />
+        <EmptyState
+          title="No leave requests"
+          message="Leave requests will appear here when employees submit them"
+        />
       )}
+
+      <StatusUpdateModal
+        visible={modalVisible}
+        leaveRequest={selectedLeave}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmStatus}
+      />
     </ScreenContainer>
   );
 };
@@ -146,28 +184,26 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: spacing.sm,
   },
   statCard: {
     flex: 1,
     borderRadius: 12,
     padding: spacing.md,
     alignItems: 'center',
-    marginHorizontal: spacing.xs,
   },
   statValue: {
-    ...typography.h2,
     fontWeight: '700',
     marginBottom: spacing.xs,
   },
   statLabel: {
-    ...typography.label,
     color: colors.textSecondary,
   },
   listContent: {
     paddingBottom: spacing.xl,
   },
   card: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -178,37 +214,36 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: spacing.sm,
   },
+  employeeInfo: {
+    flex: 1,
+  },
   employeeName: {
-    ...typography.body,
     color: colors.textPrimary,
     fontWeight: '600',
     marginBottom: spacing.xs,
   },
   leaveType: {
-    ...typography.bodySmall,
     color: colors.textSecondary,
-  },
-  statusBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: 8,
-  },
-  statusText: {
-    ...typography.label,
-    fontWeight: '600',
   },
   dateRange: {
     marginBottom: spacing.sm,
   },
   dateLabel: {
-    ...typography.bodySmall,
     color: colors.textPrimary,
     fontWeight: '500',
   },
   reason: {
-    ...typography.bodySmall,
     color: colors.textSecondary,
     fontStyle: 'italic',
+    marginBottom: spacing.md,
+  },
+  cardActions: {
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.divider,
+  },
+  updateButton: {
+    alignSelf: 'flex-start',
   },
 });
-

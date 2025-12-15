@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
-import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { AppText } from './AppText';
+import { BackButton } from './BackButton';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
@@ -11,6 +12,8 @@ interface PageHeaderProps {
   subtitle?: string;
   rightActions?: ReactNode;
   sticky?: boolean;
+  showBack?: boolean;
+  onBack?: () => void;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
@@ -18,6 +21,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle,
   rightActions,
   sticky = false,
+  showBack = false,
+  onBack,
 }) => {
   return (
     <View
@@ -29,14 +34,17 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     >
       <View style={styles.content}>
         <View style={styles.left}>
-          <AppText variant="pageTitle" style={styles.title}>
-            {title}
-          </AppText>
-          {subtitle && (
-            <AppText variant="subtitle" style={styles.subtitle}>
-              {subtitle}
+          {showBack && <BackButton onPress={onBack} />}
+          <View style={styles.titleContainer}>
+            <AppText variant="pageTitle" style={styles.title}>
+              {title}
             </AppText>
-          )}
+            {subtitle && (
+              <AppText variant="subtitle" style={styles.subtitle}>
+                {subtitle}
+              </AppText>
+            )}
+          </View>
         </View>
         {rightActions && <View style={styles.right}>{rightActions}</View>}
       </View>
@@ -69,6 +77,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   left: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleContainer: {
     flex: 1,
   },
   title: {

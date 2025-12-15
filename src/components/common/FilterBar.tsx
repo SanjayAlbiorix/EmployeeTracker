@@ -128,6 +128,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   chipActive: {
     backgroundColor: colors.primarySoft,

@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Attendance } from '../../types/models';
 import { Employee } from '../../types/models';
+import { AppText } from '../common/AppText';
+import { StatusBadge } from '../common/StatusBadge';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { shadows } from '../../theme/shadows';
 
 interface AttendanceCardProps {
@@ -13,33 +14,18 @@ interface AttendanceCardProps {
   onToggle?: () => void;
 }
 
-const getStatusColor = (status: Attendance['status']) => {
+const getAttendanceStatus = (status: Attendance['status']): 'present' | 'absent' | 'late' | 'pending' => {
   switch (status) {
     case 'present':
-      return colors.success;
+      return 'present';
     case 'absent':
-      return colors.error;
+      return 'absent';
     case 'late':
-      return colors.warning;
+      return 'late';
     case 'half_day':
-      return colors.warning;
+      return 'pending';
     default:
-      return colors.textSecondary;
-  }
-};
-
-const getStatusLabel = (status: Attendance['status']) => {
-  switch (status) {
-    case 'present':
-      return 'Present';
-    case 'absent':
-      return 'Absent';
-    case 'late':
-      return 'Late';
-    case 'half_day':
-      return 'Half Day';
-    default:
-      return status;
+      return 'absent';
   }
 };
 
@@ -48,9 +34,6 @@ export const AttendanceCard: React.FC<AttendanceCardProps> = ({
   employee,
   onToggle,
 }) => {
-  const statusColor = getStatusColor(attendance.status);
-  const statusLabel = getStatusLabel(attendance.status);
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -61,6 +44,7 @@ export const AttendanceCard: React.FC<AttendanceCardProps> = ({
   };
 
   const employeeName = employee?.name || 'Unknown Employee';
+  const statusForBadge = getAttendanceStatus(attendance.status);
 
   return (
     <TouchableOpacity
@@ -69,22 +53,29 @@ export const AttendanceCard: React.FC<AttendanceCardProps> = ({
       activeOpacity={onToggle ? 0.7 : 1}
     >
       <View style={styles.avatarContainer}>
-        <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
-          <Text style={styles.avatarText}>{getInitials(employeeName)}</Text>
+        <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
+          <AppText variant="bodySmall" style={styles.avatarText}>
+            {getInitials(employeeName)}
+          </AppText>
         </View>
       </View>
       <View style={styles.content}>
-        <Text style={styles.name}>{employeeName}</Text>
-        {employee && <Text style={styles.role}>{employee.role}</Text>}
+        <AppText variant="body" style={styles.name}>
+          {employeeName}
+        </AppText>
+        {employee && (
+          <AppText variant="caption" style={styles.role}>
+            {employee.role}
+          </AppText>
+        )}
         <View style={styles.statusContainer}>
-          <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-          <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
+          <StatusBadge status={statusForBadge} size="small" />
         </View>
         {attendance.checkIn && (
-          <Text style={styles.time}>
+          <AppText variant="caption" style={styles.time}>
             Check-in: {attendance.checkIn}
             {attendance.checkOut && ` • Check-out: ${attendance.checkOut}`}
-          </Text>
+          </AppText>
         )}
       </View>
     </TouchableOpacity>
@@ -93,11 +84,12 @@ export const AttendanceCard: React.FC<AttendanceCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
     flexDirection: 'row',
+    minHeight: 44,
   },
   avatarContainer: {
     marginRight: spacing.md,
@@ -110,7 +102,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarText: {
-    ...typography.bodySmall,
     color: colors.primary,
     fontWeight: '700',
   },
@@ -118,35 +109,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    ...typography.body,
     color: colors.textPrimary,
     fontWeight: '600',
     marginBottom: spacing.xs,
   },
   role: {
-    ...typography.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.xs,
     marginBottom: spacing.xs,
   },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: spacing.xs,
-  },
-  statusText: {
-    ...typography.label,
-    fontWeight: '600',
+  lateLabel: {
+    color: colors.warning,
+    fontWeight: '500',
   },
   time: {
-    ...typography.label,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
 });
-

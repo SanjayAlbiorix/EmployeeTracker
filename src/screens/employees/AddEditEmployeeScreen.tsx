@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/layout/ScreenContainer';
 import { Section } from '../../components/layout/Section';
-import { AppHeader } from '../../components/common/AppHeader';
+import { PageHeader } from '../../components/common/PageHeader';
 import { AppInput } from '../../components/common/AppInput';
 import { AppButton } from '../../components/common/AppButton';
 import { useEmployeeStore } from '../../store/useEmployeeStore';
@@ -73,10 +73,11 @@ export const AddEditEmployeeScreen: React.FC = () => {
 
   return (
     <ScreenContainer scrollable={false}>
-      <AppHeader
+      <PageHeader
         title={employeeId ? 'Edit Employee' : 'Add Employee'}
         showBack
-        onBack={() => navigation.goBack()}
+        onBack={() => navigation.canGoBack() && navigation.goBack()}
+        sticky
       />
 
       <KeyboardAvoidingView

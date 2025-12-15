@@ -1,48 +1,51 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { AppText } from './AppText';
-import { colors } from '../../theme/colors';
-import { spacing } from '../../theme/spacing';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { AppText } from "./AppText";
+import { colors } from "../../theme/colors";
+import { spacing } from "../../theme/spacing";
 
 type StatusType =
-  | 'active'
-  | 'inactive'
-  | 'present'
-  | 'absent'
-  | 'late'
-  | 'approved'
-  | 'pending'
-  | 'rejected'
-  | 'on_leave';
+  | "active"
+  | "inactive"
+  | "present"
+  | "absent"
+  | "late"
+  | "approved"
+  | "pending"
+  | "rejected"
+  | "on_leave";
 
 interface StatusBadgeProps {
   status: StatusType;
-  size?: 'small' | 'medium';
+  size?: "small" | "medium";
 }
 
 const getStatusConfig = (status: StatusType) => {
   switch (status) {
-    case 'active':
-    case 'present':
-    case 'approved':
+    case "active":
+    case "present":
+    case "approved":
       return {
         label: status.charAt(0).toUpperCase() + status.slice(1),
         backgroundColor: colors.successSoft,
         textColor: colors.success,
       };
-    case 'inactive':
-    case 'absent':
-    case 'rejected':
+    case "inactive":
+    case "absent":
+    case "rejected":
       return {
         label: status.charAt(0).toUpperCase() + status.slice(1),
         backgroundColor: colors.errorSoft,
         textColor: colors.error,
       };
-    case 'late':
-    case 'pending':
-    case 'on_leave':
+    case "late":
+    case "pending":
+    case "on_leave":
       return {
-        label: status === 'on_leave' ? 'On Leave' : status.charAt(0).toUpperCase() + status.slice(1),
+        label:
+          status === "on_leave"
+            ? "On Leave"
+            : status.charAt(0).toUpperCase() + status.slice(1),
         backgroundColor: colors.warningSoft,
         textColor: colors.warning,
       };
@@ -57,7 +60,7 @@ const getStatusConfig = (status: StatusType) => {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
   status,
-  size = 'medium',
+  size = "medium",
 }) => {
   const config = getStatusConfig(status);
 
@@ -66,11 +69,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       style={[
         styles.badge,
         { backgroundColor: config.backgroundColor },
-        size === 'small' && styles.small,
+        size === "small" && styles.small,
       ]}
     >
       <AppText
-        variant={size === 'small' ? 'caption' : 'label'}
+        variant={size === "small" ? "caption" : "label"}
         style={[styles.text, { color: config.textColor }]}
       >
         {config.label}
@@ -84,14 +87,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: 6,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   small: {
     paddingHorizontal: spacing.xs,
     paddingVertical: 2,
   },
   text: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
-

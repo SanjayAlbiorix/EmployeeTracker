@@ -181,6 +181,8 @@ export const EmployeeDetailScreen: React.FC = () => {
             variant="primary"
           />
         }
+        showBack
+        onBack={() => navigation.canGoBack() && navigation.goBack()}
         sticky
       />
 

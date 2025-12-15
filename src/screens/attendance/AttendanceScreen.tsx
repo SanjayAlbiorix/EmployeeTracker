@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { ScreenContainer } from '../../components/layout/ScreenContainer';
 import { Section } from '../../components/layout/Section';
-import { AppHeader } from '../../components/common/AppHeader';
+import { PageHeader } from '../../components/common/PageHeader';
 import { AttendanceCard } from '../../components/cards/AttendanceCard';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useAttendanceStore } from '../../store/useAttendanceStore';
@@ -74,7 +74,7 @@ export const AttendanceScreen: React.FC = () => {
 
   return (
     <ScreenContainer scrollable={false}>
-      <AppHeader title="Attendance" subtitle={formatDate(selectedDate)} />
+      <PageHeader title="Attendance" subtitle={formatDate(selectedDate)} sticky />
 
       <Section marginBottom="md">
         <View style={styles.dateSelector}>

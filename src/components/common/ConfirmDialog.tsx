@@ -3,10 +3,11 @@ import {
   View,
   Modal,
   StyleSheet,
-  TouchableOpacity,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText } from './AppText';
 import { AppButton } from './AppButton';
 import { colors } from '../../theme/colors';
@@ -39,49 +40,64 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onCancel}
+      statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <Animated.View
-              entering={FadeIn.duration(200)}
-              exiting={FadeOut.duration(200)}
-              style={[styles.dialog, shadows.xlarge]}
-            >
-              <View style={styles.content}>
-                <AppText variant="h2" style={styles.title}>
-                  {title}
-                </AppText>
-                <AppText variant="body" style={styles.message}>
-                  {message}
-                </AppText>
-              </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        <TouchableWithoutFeedback onPress={onCancel}>
+          <Animated.View
+            entering={FadeIn.duration(200)}
+            exiting={FadeOut.duration(200)}
+            style={styles.overlay}
+          >
+            <TouchableWithoutFeedback>
+              <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+                <Animated.View
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                  style={[styles.dialog, shadows.xlarge]}
+                >
+                  <View style={styles.content}>
+                    <AppText variant="h2" style={styles.title}>
+                      {title}
+                    </AppText>
+                    <AppText variant="body" style={styles.message}>
+                      {message}
+                    </AppText>
+                  </View>
 
-              <View style={styles.actions}>
-                <AppButton
-                  title={cancelLabel}
-                  onPress={onCancel}
-                  variant="outline"
-                  style={styles.button}
-                />
-                <AppButton
-                  title={confirmLabel}
-                  onPress={onConfirm}
-                  variant={variant}
-                  style={styles.button}
-                />
-              </View>
-            </Animated.View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+                  <View style={styles.actions}>
+                    <AppButton
+                      title={cancelLabel}
+                      onPress={onCancel}
+                      variant="outline"
+                      style={styles.button}
+                    />
+                    <AppButton
+                      title={confirmLabel}
+                      onPress={onConfirm}
+                      variant={variant}
+                      style={styles.button}
+                    />
+                  </View>
+                </Animated.View>
+              </SafeAreaView>
+            </TouchableWithoutFeedback>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardView: {
+    flex: 1,
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -89,11 +105,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.lg,
   },
+  safeArea: {
+    width: '100%',
+    maxWidth: 400,
+  },
   dialog: {
     backgroundColor: colors.surface,
     borderRadius: 16,
     width: '100%',
-    maxWidth: 400,
     overflow: 'hidden',
   },
   content: {
