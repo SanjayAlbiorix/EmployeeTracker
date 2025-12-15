@@ -13,6 +13,8 @@ import { LeaveRequest } from '../../types/models';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
+import { RoleGuard } from '../../components/auth/RoleGuard';
+import { Alert } from 'react-native';
 
 interface LeaveCardProps {
   leaveRequest: LeaveRequest;
@@ -71,14 +73,27 @@ const LeaveCard: React.FC<LeaveCardProps> = ({ leaveRequest, onUpdateStatus }) =
         </AppText>
       )}
 
-      <View style={styles.cardActions}>
-        <AppButton
-          title="Update Status"
-          onPress={() => onUpdateStatus(leaveRequest)}
-          variant="outline"
-          style={styles.updateButton}
-        />
-      </View>
+      <RoleGuard allow={['admin', 'manager']}>
+        <View style={styles.cardActions}>
+          <RoleGuard allow={['admin']}>
+            <AppButton
+              title="Update Status"
+              onPress={() => onUpdateStatus(leaveRequest)}
+              variant="outline"
+              style={styles.updateButton}
+            />
+          </RoleGuard>
+          <RoleGuard allow={['manager']}>
+             <AppButton
+              title="Recommend Approval"
+              onPress={() => Alert.alert('Success', 'Recommendation sent to HR')}
+              variant="outline"
+              style={styles.updateButton}
+              disabled={leaveRequest.status !== 'pending'}
+            />
+          </RoleGuard>
+        </View>
+      </RoleGuard>
     </View>
   );
 };

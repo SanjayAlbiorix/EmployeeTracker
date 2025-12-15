@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from './AppText';
 import { BackButton } from './BackButton';
 import { colors } from '../../theme/colors';
@@ -24,10 +25,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   showBack = false,
   onBack,
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
     <View
       style={[
         styles.container,
+        { paddingTop: insets.top + (isWeb ? 0 : spacing.sm) }, // Add safe area + optional extra padding
         sticky && isWeb && styles.sticky,
         !sticky && shadows.header,
       ]}
@@ -55,7 +59,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
-    paddingVertical: spacing.lg,
+    paddingBottom: spacing.lg, // moved vertical padding split
+    // paddingVertical removed to handle top manually
     paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.divider,

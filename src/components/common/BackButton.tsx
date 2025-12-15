@@ -41,11 +41,9 @@ export const BackButton: React.FC<BackButtonProps> = ({
       <AppText variant="body" style={styles.icon}>
         {isWeb ? '←' : '←'}
       </AppText>
-      {isWeb && (
-        <AppText variant="body" style={styles.label}>
-          {label}
-        </AppText>
-      )}
+      <AppText variant="body" style={styles.label}>
+        {label}
+      </AppText>
     </TouchableOpacity>
   );
 };
@@ -57,8 +55,9 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
-    minHeight: 44,
-    minWidth: 44,
+    minHeight: 48, // Increased touch target
+    minWidth: 48,
+    justifyContent: 'center',
   },
   icon: {
     fontSize: 24,

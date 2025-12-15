@@ -11,10 +11,12 @@ import { FilterBar } from '../../components/common/FilterBar';
 import { AppButton } from '../../components/common/AppButton';
 import { DataTable, Column } from '../../components/common/DataTable';
 import { EmployeeCard } from '../../components/cards/EmployeeCard';
+import { RoleGuard } from '../../components/auth/RoleGuard';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { AppText } from '../../components/common/AppText';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useEmployeeStore } from '../../store/useEmployeeStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { Employee } from '../../types/models';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
@@ -149,11 +151,13 @@ export const EmployeeListScreen: React.FC = () => {
   ];
 
   const rightActions = (
-    <AppButton
-      title="+ Add Employee"
-      onPress={handleAddEmployee}
-      variant="primary"
-    />
+    <RoleGuard allow={['admin']}>
+      <AppButton
+        title="+ Add Employee"
+        onPress={handleAddEmployee}
+        variant="primary"
+      />
+    </RoleGuard>
   );
 
   return (
@@ -230,9 +234,11 @@ export const EmployeeListScreen: React.FC = () => {
       )}
 
       {!isWeb && (
-        <TouchableOpacity style={styles.fab} onPress={handleAddEmployee}>
-          <AppText variant="body" style={styles.fabText}>+</AppText>
-        </TouchableOpacity>
+        <RoleGuard allow={['admin']}>
+          <TouchableOpacity style={styles.fab} onPress={handleAddEmployee}>
+            <AppText variant="body" style={styles.fabText}>+</AppText>
+          </TouchableOpacity>
+        </RoleGuard>
       )}
     </ScreenContainer>
   );

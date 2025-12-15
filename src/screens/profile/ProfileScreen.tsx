@@ -39,8 +39,24 @@ export const ProfileScreen: React.FC = () => {
             </View>
             <Text style={styles.name}>{user?.name || 'Admin User'}</Text>
             <Text style={styles.email}>{user?.email || 'admin@company.com'}</Text>
-            <View style={styles.roleBadge}>
-              <Text style={styles.roleText}>{user?.role?.toUpperCase() || 'ADMIN'}</Text>
+            
+            <View style={styles.roleContainer}>
+              <View style={[styles.roleBadge, { 
+                backgroundColor: user?.role === 'admin' ? colors.primary + '20' :
+                                user?.role === 'manager' ? colors.warning + '20' :
+                                colors.success + '20' 
+              }]}>
+                <Text style={[styles.roleText, {
+                  color: user?.role === 'admin' ? colors.primary :
+                         user?.role === 'manager' ? colors.warning :
+                         colors.success
+                }]}>{user?.role?.toUpperCase() || 'ADMIN'}</Text>
+              </View>
+              <Text style={styles.roleDescription}>
+                {user?.role === 'admin' ? 'Full System Access' :
+                 user?.role === 'manager' ? 'Team Management' :
+                 'Personal View'}
+              </Text>
             </View>
           </View>
         </Section>
@@ -62,6 +78,21 @@ export const ProfileScreen: React.FC = () => {
             <View style={styles.settingItem}>
               <Text style={styles.settingLabel}>Theme</Text>
               <Text style={styles.settingValue}>Light</Text>
+            </View>
+
+            <View style={styles.settingItem}>
+              <Text style={styles.settingLabel}>Role (Dev Only)</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {(['admin', 'manager', 'employee'] as const).map((r) => (
+                  <AppButton
+                    key={r}
+                    title={r.charAt(0).toUpperCase()}
+                    variant={user?.role === r ? 'primary' : 'outline'}
+                    onPress={() => useAuthStore.getState().setRole(r)}
+                    style={{ minWidth: 40, height: 32, paddingHorizontal: 4 }}
+                  />
+                ))}
+              </View>
             </View>
           </View>
         </Section>
@@ -122,11 +153,19 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
+  roleContainer: {
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   roleBadge: {
-    backgroundColor: colors.primary + '20',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: 8,
+  },
+  roleDescription: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 4,
   },
   roleText: {
     ...typography.label,

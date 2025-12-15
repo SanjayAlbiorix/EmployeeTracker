@@ -1,20 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import { View, StyleSheet } from 'react-native';
+import { AnimatedCard } from '../common/AnimatedCard';
 import { AppText } from '../common/AppText';
 import { StatusBadge } from '../common/StatusBadge';
 import { Employee } from '../../types/models';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { shadows } from '../../theme/shadows';
-import { isWeb } from '../../utils/platform';
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -22,27 +13,6 @@ interface EmployeeCardProps {
 }
 
 export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onPress }) => {
-  const scale = useSharedValue(1);
-  const shadowOpacity = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const shadowStyle = useAnimatedStyle(() => ({
-    shadowOpacity: isWeb ? undefined : shadowOpacity.value * 0.1,
-  }));
-
-  const handlePressIn = () => {
-    scale.value = withSpring(0.98);
-    shadowOpacity.value = withTiming(1, { duration: 150 });
-  };
-
-  const handlePressOut = () => {
-    scale.value = withSpring(1);
-    shadowOpacity.value = withTiming(0, { duration: 150 });
-  };
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -53,12 +23,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onPress })
   };
 
   return (
-    <AnimatedPressable
-      style={[styles.card, shadows.card, animatedStyle, shadowStyle]}
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
+    <AnimatedCard onPress={onPress} style={styles.card}>
       <View style={styles.avatarContainer}>
         <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
           <AppText variant="body" style={styles.avatarText}>
@@ -80,7 +45,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onPress })
           <StatusBadge status={employee.status} size="small" />
         </View>
       </View>
-    </AnimatedPressable>
+    </AnimatedCard>
   );
 };
 
@@ -91,9 +56,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
     flexDirection: 'row',
-    ...(isWeb && {
-      transition: 'box-shadow 0.2s ease',
-    } as any),
   },
   avatarContainer: {
     marginRight: spacing.md,

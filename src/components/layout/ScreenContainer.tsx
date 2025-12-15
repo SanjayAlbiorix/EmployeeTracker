@@ -10,6 +10,7 @@ interface ScreenContainerProps {
   style?: any;
   scrollable?: boolean;
   backgroundColor?: string;
+  edges?: ('top' | 'right' | 'bottom' | 'left')[];
 }
 
 export const ScreenContainer: React.FC<ScreenContainerProps> = ({
@@ -17,6 +18,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
   style,
   scrollable = false,
   backgroundColor = colors.background,
+  edges = ['left', 'right', 'bottom'], // Default to NO top padding (header handles it, or explicit opt-in)
 }) => {
   const content = (
     <View style={[styles.container, { backgroundColor }, style]}>
@@ -26,7 +28,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   if (scrollable) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={edges}>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -38,7 +40,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
     );
   }
 
-  return <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>{content}</SafeAreaView>;
+  return <SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={edges}>{content}</SafeAreaView>;
 };
 
 const styles = StyleSheet.create({

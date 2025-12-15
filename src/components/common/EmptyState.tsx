@@ -13,9 +13,11 @@ interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = ({ title, message, icon = '📋' }) => {
   return (
     <View style={styles.container}>
-      <AppText variant="body" style={styles.icon}>
-        {icon}
-      </AppText>
+      <View style={styles.iconContainer}>
+        <AppText variant="body" style={styles.icon}>
+          {icon}
+        </AppText>
+      </View>
       <AppText variant="h3" style={styles.title}>
         {title}
       </AppText>
@@ -36,9 +38,17 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     minHeight: 300,
   },
-  icon: {
-    fontSize: 64,
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.primary + '10', // 10% opacity
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: spacing.lg,
+  },
+  icon: {
+    fontSize: 40,
   },
   title: {
     color: colors.textPrimary,

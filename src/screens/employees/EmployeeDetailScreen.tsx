@@ -12,10 +12,13 @@ import { StatusBadge } from '../../components/common/StatusBadge';
 import { Tabs } from '../../components/common/Tabs';
 import { useEmployeeStore } from '../../store/useEmployeeStore';
 import { useAttendanceStore } from '../../store/useAttendanceStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { RootStackParamList } from '../../navigation/types';
+import { RoleGuard } from '../../components/auth/RoleGuard';
+import { PermissionHint } from '../../components/auth/PermissionHint';
 import { isWeb } from '../../utils/platform';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -175,11 +178,17 @@ export const EmployeeDetailScreen: React.FC = () => {
       <PageHeader
         title="Employee Details"
         rightActions={
-          <AppButton
-            title="Edit"
-            onPress={handleEdit}
-            variant="primary"
-          />
+          <>
+            <RoleGuard allow={['admin']}>
+              <AppButton title="Edit" onPress={handleEdit} variant="primary" />
+            </RoleGuard>
+            <RoleGuard allow={['manager']}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                 {isWeb && <PermissionHint text="Read Only" />}
+                 <AppButton title="Edit" disabled variant="outline" onPress={() => {}} />
+              </View>
+            </RoleGuard>
+          </>
         }
         showBack
         onBack={() => navigation.canGoBack() && navigation.goBack()}

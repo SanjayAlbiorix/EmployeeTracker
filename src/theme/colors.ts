@@ -22,6 +22,8 @@ export const colors = {
   warningSoft: '#FEF3C7',
   error: '#EF4444',
   errorSoft: '#FEE2E2',
+  info: '#3B82F6',
+  infoSoft: '#DBEAFE',
   
   // Border & divider
   border: '#E5E7EB',

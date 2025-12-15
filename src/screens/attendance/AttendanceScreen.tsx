@@ -7,6 +7,7 @@ import { AttendanceCard } from '../../components/cards/AttendanceCard';
 import { EmptyState } from '../../components/common/EmptyState';
 import { useAttendanceStore } from '../../store/useAttendanceStore';
 import { useEmployeeStore } from '../../store/useEmployeeStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
@@ -54,7 +55,21 @@ export const AttendanceScreen: React.FC = () => {
     return [...withAttendance, ...withoutAttendance];
   }, [dateAttendance, employeesWithoutAttendance, selectedDate]);
 
+  const user = useAuthStore((state) => state.user);
+
+  const displayedAttendance = useMemo(() => {
+    if (user?.role === 'employee') {
+      return allAttendance.filter((item) => item.employee?.id === user.id);
+    }
+    return allAttendance;
+  }, [allAttendance, user]);
+
   const handleToggleAttendance = (employeeId: string, currentStatus: string) => {
+    if (user?.role !== 'admin') {
+      alert('Only administrators can update attendance.');
+      return;
+    }
+
     if (currentStatus === 'present' || currentStatus === 'late') {
       markAbsent(employeeId, selectedDate);
     } else {
@@ -107,9 +122,9 @@ export const AttendanceScreen: React.FC = () => {
         </View>
       </Section>
 
-      {allAttendance.length > 0 ? (
+      {displayedAttendance.length > 0 ? (
         <FlatList
-          data={allAttendance}
+          data={displayedAttendance}
           keyExtractor={(item) => item.attendance.id}
           renderItem={({ item }) => (
             <AttendanceCard
@@ -127,7 +142,7 @@ export const AttendanceScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <EmptyState title="No employees found" message="Add employees to track attendance" />
+        <EmptyState title="No records found" message="No attendance records for this date" />
       )}
     </ScreenContainer>
   );

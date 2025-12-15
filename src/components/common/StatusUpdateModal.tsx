@@ -203,7 +203,9 @@ const styles = StyleSheet.create({
   },
   modalContentWeb: {
     borderRadius: 16,
-    ...(isWeb && { maxHeight: '80vh' } as any),
+    maxHeight: '80vh' as any,
+    width: 600, // Fixed width for web
+    alignSelf: 'center',
   },
   modalContentMobile: {
     borderTopLeftRadius: 20,

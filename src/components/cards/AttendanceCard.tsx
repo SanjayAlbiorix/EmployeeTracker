@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { AnimatedCard } from '../common/AnimatedCard';
 import { Attendance } from '../../types/models';
 import { Employee } from '../../types/models';
 import { AppText } from '../common/AppText';
 import { StatusBadge } from '../common/StatusBadge';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { shadows } from '../../theme/shadows';
 
 interface AttendanceCardProps {
   attendance: Attendance;
@@ -47,10 +47,10 @@ export const AttendanceCard: React.FC<AttendanceCardProps> = ({
   const statusForBadge = getAttendanceStatus(attendance.status);
 
   return (
-    <TouchableOpacity
-      style={[styles.card, shadows.small]}
+    <AnimatedCard
+      style={styles.card}
       onPress={onToggle}
-      activeOpacity={onToggle ? 0.7 : 1}
+      disabled={!onToggle}
     >
       <View style={styles.avatarContainer}>
         <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
@@ -78,7 +78,7 @@ export const AttendanceCard: React.FC<AttendanceCardProps> = ({
           </AppText>
         )}
       </View>
-    </TouchableOpacity>
+    </AnimatedCard>
   );
 };
 
