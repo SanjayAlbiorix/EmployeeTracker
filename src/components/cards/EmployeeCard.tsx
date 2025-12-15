@@ -1,45 +1,47 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { AppText } from '../common/AppText';
+import { StatusBadge } from '../common/StatusBadge';
 import { Employee } from '../../types/models';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { shadows } from '../../theme/shadows';
+import { isWeb } from '../../utils/platform';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface EmployeeCardProps {
   employee: Employee;
   onPress: () => void;
 }
 
-const getStatusColor = (status: Employee['status']) => {
-  switch (status) {
-    case 'active':
-      return colors.success;
-    case 'inactive':
-      return colors.error;
-    case 'on_leave':
-      return colors.warning;
-    default:
-      return colors.textSecondary;
-  }
-};
-
-const getStatusLabel = (status: Employee['status']) => {
-  switch (status) {
-    case 'active':
-      return 'Active';
-    case 'inactive':
-      return 'Inactive';
-    case 'on_leave':
-      return 'On Leave';
-    default:
-      return status;
-  }
-};
-
 export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onPress }) => {
-  const statusColor = getStatusColor(employee.status);
-  const statusLabel = getStatusLabel(employee.status);
+  const scale = useSharedValue(1);
+  const shadowOpacity = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const shadowStyle = useAnimatedStyle(() => ({
+    shadowOpacity: isWeb ? undefined : shadowOpacity.value * 0.1,
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.98);
+    shadowOpacity.value = withTiming(1, { duration: 150 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1);
+    shadowOpacity.value = withTiming(0, { duration: 150 });
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -51,36 +53,47 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onPress })
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.card, shadows.small]}
+    <AnimatedPressable
+      style={[styles.card, shadows.card, animatedStyle, shadowStyle]}
       onPress={onPress}
-      activeOpacity={0.7}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
     >
       <View style={styles.avatarContainer}>
-        <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
-          <Text style={styles.avatarText}>{getInitials(employee.name)}</Text>
+        <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
+          <AppText variant="body" style={styles.avatarText}>
+            {getInitials(employee.name)}
+          </AppText>
         </View>
       </View>
       <View style={styles.content}>
-        <Text style={styles.name}>{employee.name}</Text>
-        <Text style={styles.role}>{employee.role}</Text>
-        <Text style={styles.department}>{employee.department}</Text>
+        <AppText variant="h3" style={styles.name}>
+          {employee.name}
+        </AppText>
+        <AppText variant="bodySmall" style={styles.role}>
+          {employee.role}
+        </AppText>
+        <AppText variant="caption" style={styles.department}>
+          {employee.department}
+        </AppText>
         <View style={styles.statusContainer}>
-          <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-          <Text style={styles.statusText}>{statusLabel}</Text>
+          <StatusBadge status={employee.status} size="small" />
         </View>
       </View>
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
     flexDirection: 'row',
+    ...(isWeb && {
+      transition: 'box-shadow 0.2s ease',
+    } as any),
   },
   avatarContainer: {
     marginRight: spacing.md,
@@ -93,7 +106,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarText: {
-    ...typography.h3,
     color: colors.primary,
     fontWeight: '700',
   },
@@ -101,34 +113,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    ...typography.h3,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   role: {
-    ...typography.bodySmall,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
     fontWeight: '500',
   },
   department: {
-    ...typography.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: spacing.xs,
-  },
-  statusText: {
-    ...typography.label,
-    color: colors.textSecondary,
+    alignSelf: 'flex-start',
   },
 });
-

@@ -1,12 +1,18 @@
 import React from 'react';
 import {
-  TouchableOpacity,
-  Text,
   StyleSheet,
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Pressable,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { AppText } from './AppText';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
@@ -22,6 +28,8 @@ interface AppButtonProps {
   textStyle?: TextStyle;
 }
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 export const AppButton: React.FC<AppButtonProps> = ({
   title,
   onPress,
@@ -31,6 +39,24 @@ export const AppButton: React.FC<AppButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.97);
+    opacity.value = withTiming(0.8, { duration: 100 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1);
+    opacity.value = withTiming(1, { duration: 100 });
+  };
+
   const buttonStyles = [
     styles.button,
     styles[variant],
@@ -46,18 +72,21 @@ export const AppButton: React.FC<AppButtonProps> = ({
   ];
 
   return (
-    <TouchableOpacity
-      style={buttonStyles}
+    <AnimatedPressable
+      style={[buttonStyles, animatedStyle]}
       onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={disabled || loading}
-      activeOpacity={0.7}
     >
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? colors.white : colors.primary} />
       ) : (
-        <Text style={textStyles}>{title}</Text>
+        <AppText variant="button" style={textStyles}>
+          {title}
+        </AppText>
       )}
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 };
 

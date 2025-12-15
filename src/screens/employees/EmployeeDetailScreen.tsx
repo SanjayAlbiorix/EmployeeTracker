@@ -1,19 +1,22 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/layout/ScreenContainer';
 import { Section } from '../../components/layout/Section';
-import { AppHeader } from '../../components/common/AppHeader';
+import { PageHeader } from '../../components/common/PageHeader';
 import { AppButton } from '../../components/common/AppButton';
+import { AppText } from '../../components/common/AppText';
+import { StatusBadge } from '../../components/common/StatusBadge';
+import { Tabs } from '../../components/common/Tabs';
 import { useEmployeeStore } from '../../store/useEmployeeStore';
 import { useAttendanceStore } from '../../store/useAttendanceStore';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { shadows } from '../../theme/shadows';
 import { RootStackParamList } from '../../navigation/types';
+import { isWeb } from '../../utils/platform';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type EmployeeDetailRouteProp = RouteProp<RootStackParamList, 'EmployeeDetail'>;
@@ -22,6 +25,8 @@ export const EmployeeDetailScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<EmployeeDetailRouteProp>();
   const { employeeId } = route.params;
+  const [activeTab, setActiveTab] = useState('overview');
+
   const getEmployeeById = useEmployeeStore((state) => state.getEmployeeById);
   const getAttendanceByEmployee = useAttendanceStore(
     (state) => state.getAttendanceByEmployee
@@ -30,10 +35,20 @@ export const EmployeeDetailScreen: React.FC = () => {
   const employee = getEmployeeById(employeeId);
   const attendance = getAttendanceByEmployee(employeeId);
 
+  const stats = useMemo(() => {
+    const presentCount = attendance.filter((a) => a.status === 'present').length;
+    const absentCount = attendance.filter((a) => a.status === 'absent').length;
+    const lateCount = attendance.filter((a) => a.status === 'late').length;
+    return { presentCount, absentCount, lateCount, total: attendance.length };
+  }, [attendance]);
+
   if (!employee) {
     return (
       <ScreenContainer>
-        <AppHeader title="Employee Not Found" showBack onBack={() => navigation.goBack()} />
+        <PageHeader title="Employee Not Found" />
+        <Section>
+          <AppText variant="body">Employee not found</AppText>
+        </Section>
       </ScreenContainer>
     );
   }
@@ -47,87 +62,159 @@ export const EmployeeDetailScreen: React.FC = () => {
       .slice(0, 2);
   };
 
-  const presentCount = attendance.filter((a) => a.status === 'present').length;
-  const absentCount = attendance.filter((a) => a.status === 'absent').length;
-
   const handleEdit = () => {
     navigation.navigate('AddEditEmployee', { employeeId });
   };
 
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'attendance', label: 'Attendance' },
+    { key: 'leave', label: 'Leave' },
+  ];
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'attendance':
+        return (
+          <View style={styles.tabContent}>
+            <AppText variant="sectionHeader" style={styles.tabTitle}>
+              Attendance History
+            </AppText>
+            <View style={styles.statsGrid}>
+              <View style={[styles.statBox, shadows.small]}>
+                <AppText variant="h2" style={{ color: colors.success }}>
+                  {stats.presentCount}
+                </AppText>
+                <AppText variant="caption" style={{ color: colors.textSecondary }}>
+                  Present Days
+                </AppText>
+              </View>
+              <View style={[styles.statBox, shadows.small]}>
+                <AppText variant="h2" style={{ color: colors.error }}>
+                  {stats.absentCount}
+                </AppText>
+                <AppText variant="caption" style={{ color: colors.textSecondary }}>
+                  Absent Days
+                </AppText>
+              </View>
+              <View style={[styles.statBox, shadows.small]}>
+                <AppText variant="h2" style={{ color: colors.warning }}>
+                  {stats.lateCount}
+                </AppText>
+                <AppText variant="caption" style={{ color: colors.textSecondary }}>
+                  Late Days
+                </AppText>
+              </View>
+            </View>
+          </View>
+        );
+      case 'leave':
+        return (
+          <View style={styles.tabContent}>
+            <AppText variant="sectionHeader" style={styles.tabTitle}>
+              Leave Records
+            </AppText>
+            <AppText variant="body" style={{ color: colors.textSecondary }}>
+              No leave records available
+            </AppText>
+          </View>
+        );
+      default:
+        return (
+          <View style={styles.tabContent}>
+            <View style={[styles.infoCard, shadows.small]}>
+              <AppText variant="sectionHeader" style={styles.infoTitle}>
+                Contact Information
+              </AppText>
+              <View style={styles.infoRow}>
+                <AppText variant="label" style={styles.infoLabel}>
+                  Email
+                </AppText>
+                <AppText variant="body" style={styles.infoValue}>
+                  {employee.email}
+                </AppText>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoRow}>
+                <AppText variant="label" style={styles.infoLabel}>
+                  Phone
+                </AppText>
+                <AppText variant="body" style={styles.infoValue}>
+                  {employee.phone}
+                </AppText>
+              </View>
+            </View>
+
+            <View style={[styles.infoCard, shadows.small]}>
+              <AppText variant="sectionHeader" style={styles.infoTitle}>
+                Employee Information
+              </AppText>
+              <View style={styles.infoRow}>
+                <AppText variant="label" style={styles.infoLabel}>
+                  Status
+                </AppText>
+                <StatusBadge status={employee.status} />
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.infoRow}>
+                <AppText variant="label" style={styles.infoLabel}>
+                  Join Date
+                </AppText>
+                <AppText variant="body" style={styles.infoValue}>
+                  {new Date(employee.joinDate).toLocaleDateString()}
+                </AppText>
+              </View>
+            </View>
+          </View>
+        );
+    }
+  };
+
   return (
     <ScreenContainer scrollable={false}>
-      <AppHeader title="Employee Details" showBack onBack={() => navigation.goBack()} />
+      <PageHeader
+        title="Employee Details"
+        rightActions={
+          <AppButton
+            title="Edit"
+            onPress={handleEdit}
+            variant="primary"
+          />
+        }
+        sticky
+      />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Section>
           <View style={[styles.profileCard, shadows.medium]}>
-            <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
-              <Text style={styles.avatarText}>{getInitials(employee.name)}</Text>
-            </View>
-            <Text style={styles.name}>{employee.name}</Text>
-            <Text style={styles.role}>{employee.role}</Text>
-            <Text style={styles.department}>{employee.department}</Text>
-          </View>
-        </Section>
-
-        <Section>
-          <View style={[styles.infoCard, shadows.small]}>
-            <Text style={styles.sectionTitle}>Contact Information</Text>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Email</Text>
-              <Text style={styles.infoValue}>{employee.email}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Phone</Text>
-              <Text style={styles.infoValue}>{employee.phone}</Text>
-            </View>
-          </View>
-        </Section>
-
-        <Section>
-          <View style={[styles.infoCard, shadows.small]}>
-            <Text style={styles.sectionTitle}>Employee Information</Text>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Status</Text>
-              <Text style={[styles.infoValue, { color: colors.primary }]}>
-                {employee.status === 'active'
-                  ? 'Active'
-                  : employee.status === 'on_leave'
-                  ? 'On Leave'
-                  : 'Inactive'}
-              </Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Join Date</Text>
-              <Text style={styles.infoValue}>
-                {new Date(employee.joinDate).toLocaleDateString()}
-              </Text>
-            </View>
-          </View>
-        </Section>
-
-        <Section>
-          <View style={[styles.infoCard, shadows.small]}>
-            <Text style={styles.sectionTitle}>Attendance Summary</Text>
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{presentCount}</Text>
-                <Text style={styles.statLabel}>Present</Text>
+            <View style={styles.profileHeader}>
+              <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
+                <AppText variant="h1" style={{ color: colors.primary, fontWeight: '700' }}>
+                  {getInitials(employee.name)}
+                </AppText>
+                <View style={[styles.statusIndicator, { backgroundColor: colors.success }]} />
               </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{absentCount}</Text>
-                <Text style={styles.statLabel}>Absent</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{attendance.length}</Text>
-                <Text style={styles.statLabel}>Total Days</Text>
+              <View style={styles.profileInfo}>
+                <AppText variant="pageTitle" style={styles.name}>
+                  {employee.name}
+                </AppText>
+                <AppText variant="subtitle" style={styles.role}>
+                  {employee.role}
+                </AppText>
+                <AppText variant="bodySmall" style={styles.department}>
+                  {employee.department}
+                </AppText>
+                <View style={styles.statusContainer}>
+                  <StatusBadge status={employee.status} />
+                </View>
               </View>
             </View>
           </View>
         </Section>
 
-        <Section marginBottom="xl">
-          <AppButton title="Edit Employee" onPress={handleEdit} variant="primary" />
+        <Section>
+          <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+          {renderContent()}
         </Section>
       </ScrollView>
     </ScreenContainer>
@@ -139,46 +226,79 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileCard: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: spacing.xl,
-    alignItems: 'center',
+  },
+  profileHeader: {
+    flexDirection: isWeb ? 'row' : 'column',
+    alignItems: isWeb ? 'center' : 'flex-start',
+    gap: spacing.lg,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    position: 'relative',
   },
-  avatarText: {
-    ...typography.h1,
-    color: colors.primary,
-    fontWeight: '700',
+  statusIndicator: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 3,
+    borderColor: colors.surface,
+  },
+  profileInfo: {
+    flex: 1,
   },
   name: {
-    ...typography.h2,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   role: {
-    ...typography.body,
     color: colors.textPrimary,
-    fontWeight: '500',
+    fontWeight: '600',
     marginBottom: spacing.xs,
   },
   department: {
-    ...typography.bodySmall,
     color: colors.textSecondary,
+    marginBottom: spacing.md,
+  },
+  statusContainer: {
+    alignSelf: 'flex-start',
+  },
+  tabContent: {
+    paddingTop: spacing.md,
+  },
+  tabTitle: {
+    color: colors.textPrimary,
+    marginBottom: spacing.lg,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  statBox: {
+    flex: 1,
+    minWidth: 150,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: spacing.lg,
+    alignItems: 'center',
   },
   infoCard: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: colors.surface,
     borderRadius: 12,
-    padding: spacing.md,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
   },
-  sectionTitle: {
-    ...typography.h3,
+  infoTitle: {
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
@@ -187,34 +307,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   infoLabel: {
-    ...typography.label,
     color: colors.textSecondary,
   },
   infoValue: {
-    ...typography.body,
     color: colors.textPrimary,
     fontWeight: '500',
   },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: spacing.md,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    ...typography.h2,
-    color: colors.primary,
-    marginBottom: spacing.xs,
-  },
-  statLabel: {
-    ...typography.label,
-    color: colors.textSecondary,
+  divider: {
+    height: 1,
+    backgroundColor: colors.divider,
+    marginVertical: spacing.sm,
   },
 });
-

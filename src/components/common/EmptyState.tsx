@@ -1,19 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { AppText } from './AppText';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 interface EmptyStateProps {
   title: string;
   message?: string;
+  icon?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ title, message }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ title, message, icon = '📋' }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      {message && <Text style={styles.message}>{message}</Text>}
+      <AppText variant="body" style={styles.icon}>
+        {icon}
+      </AppText>
+      <AppText variant="h3" style={styles.title}>
+        {title}
+      </AppText>
+      {message && (
+        <AppText variant="bodySmall" style={styles.message}>
+          {message}
+        </AppText>
+      )}
     </View>
   );
 };
@@ -24,17 +34,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.xl,
+    minHeight: 300,
+  },
+  icon: {
+    fontSize: 64,
+    marginBottom: spacing.lg,
   },
   title: {
-    ...typography.h3,
     color: colors.textPrimary,
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
   message: {
-    ...typography.bodySmall,
     color: colors.textSecondary,
     textAlign: 'center',
+    maxWidth: 400,
   },
 });
-

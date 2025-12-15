@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { AppText } from '../common/AppText';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { shadows } from '../../theme/shadows';
 
 interface StatCardProps {
@@ -10,6 +10,11 @@ interface StatCardProps {
   value: string | number;
   icon?: string;
   color?: string;
+  trend?: {
+    value: number;
+    label: string;
+    isPositive?: boolean;
+  };
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -17,18 +22,55 @@ export const StatCard: React.FC<StatCardProps> = ({
   value,
   icon,
   color = colors.primary,
+  trend,
 }) => {
+  const colorSoft = color === colors.primary ? colors.primarySoft :
+                    color === colors.success ? colors.successSoft :
+                    color === colors.warning ? colors.warningSoft :
+                    color === colors.error ? colors.errorSoft : colors.primarySoft;
+
   return (
-    <View style={[styles.card, shadows.medium]}>
+    <View style={[styles.card, shadows.card, { backgroundColor: colorSoft + '15' }]}>
       <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={[styles.value, { color }]}>{value}</Text>
-      </View>
-      {icon && (
-        <View style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
-          <Text style={[styles.icon, { color }]}>{icon}</Text>
+        <View style={styles.header}>
+          <AppText variant="label" style={styles.title}>
+            {title}
+          </AppText>
+          {icon && (
+            <View style={[styles.iconContainer, { backgroundColor: colorSoft }]}>
+              <AppText variant="body" style={[styles.icon, { color }]}>
+                {icon}
+              </AppText>
+            </View>
+          )}
         </View>
-      )}
+        <View style={styles.valueRow}>
+          <AppText variant="pageTitle" style={[styles.value, { color }]}>
+            {value}
+          </AppText>
+        </View>
+        {trend && (
+          <View style={styles.trend}>
+            <View style={[
+              styles.trendIndicator,
+              { backgroundColor: trend.isPositive ? colors.successSoft : colors.errorSoft }
+            ]}>
+              <AppText
+                variant="caption"
+                style={[
+                  styles.trendText,
+                  { color: trend.isPositive ? colors.success : colors.error }
+                ]}
+              >
+                {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
+              </AppText>
+            </View>
+            <AppText variant="caption" style={styles.trendLabel}>
+              {trend.label}
+            </AppText>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -37,33 +79,61 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.cardBackground,
     borderRadius: 16,
-    padding: spacing.md,
+    padding: spacing.lg,
     flex: 1,
-    minWidth: 140,
+    minWidth: 200,
     marginHorizontal: spacing.xs,
+    marginBottom: spacing.md,
+    overflow: 'hidden',
+    position: 'relative',
   },
   content: {
-    flex: 1,
+    position: 'relative',
+    zIndex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
   },
   title: {
-    ...typography.label,
+    flex: 1,
     color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  value: {
-    ...typography.h2,
-    fontWeight: '700',
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: spacing.md,
   },
   icon: {
-    fontSize: 24,
+    fontSize: 20,
+  },
+  valueRow: {
+    marginBottom: spacing.sm,
+  },
+  value: {
+    fontSize: 32,
+    fontWeight: '700',
+    lineHeight: 40,
+  },
+  trend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  trendIndicator: {
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  trendText: {
+    fontWeight: '600',
+  },
+  trendLabel: {
+    color: colors.textSecondary,
   },
 });
 
