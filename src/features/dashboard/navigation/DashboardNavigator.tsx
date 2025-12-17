@@ -15,6 +15,9 @@ import EmployeeAttendanceScreen from "@/features/attendance/screens/EmployeeAtte
 import AdminLeaveScreen from "@/features/leave/screens/AdminLeaveScreen";
 import EmployeeLeaveScreen from "@/features/leave/screens/EmployeeLeaveScreen";
 import RequestLeaveScreen from "@/features/leave/screens/RequestLeaveScreen";
+import AdminPayrollScreen from "@/features/payroll/screens/AdminPayrollScreen";
+import PayrollRunScreen from "@/features/payroll/screens/PayrollRunScreen";
+import EmployeePayslipScreen from "@/features/payroll/screens/EmployeePayslipScreen";
 
 import { createStackNavigator } from "@react-navigation/stack";
 import { theme } from "@/ui/theme";
@@ -35,6 +38,8 @@ const DashboardNavigator = () => {
         <Stack.Screen name="Employees" component={EmployeeNavigator} />
         <Stack.Screen name="Attendance" component={AdminAttendanceScreen} />
         <Stack.Screen name="Leaves" component={AdminLeaveScreen} />
+        <Stack.Screen name="Payroll" component={AdminPayrollScreen} />
+        <Stack.Screen name="PayrollRun" component={PayrollRunScreen} />
       </Stack.Navigator>
     );
   }
@@ -46,6 +51,7 @@ const DashboardNavigator = () => {
         <Stack.Screen name="Attendance" component={EmployeeAttendanceScreen} />
         <Stack.Screen name="Leaves" component={EmployeeLeaveScreen} />
         <Stack.Screen name="RequestLeave" component={RequestLeaveScreen} />
+        <Stack.Screen name="Payslip" component={EmployeePayslipScreen} />
       </Stack.Navigator>
     );
   }

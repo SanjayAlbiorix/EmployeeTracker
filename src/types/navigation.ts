@@ -23,6 +23,9 @@ export type DashboardStackParamList = {
   Attendance: undefined;
   Leaves: undefined;
   RequestLeave: undefined;
+  Payroll: undefined;
+  PayrollRun: undefined;
+  Payslip: undefined;
 };
 
 export type EmployeeStackParamList = {

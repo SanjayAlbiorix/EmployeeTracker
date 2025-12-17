@@ -59,7 +59,13 @@ const SIDEBAR_ITEMS: SidebarItemConfig[] = [
     key: "payroll",
     label: "Payroll",
     roles: ["admin"],
-    route: "AdminDashboard", // Placeholder
+    route: "Payroll",
+  },
+  {
+    key: "payslip",
+    label: "Payslip",
+    roles: ["employee"],
+    route: "Payslip",
   },
 ];
 
