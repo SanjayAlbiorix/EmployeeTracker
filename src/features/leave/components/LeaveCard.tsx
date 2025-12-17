@@ -43,12 +43,12 @@ const LeaveCard: React.FC<Props> = ({ record, onApprove, onReject }) => {
           <Button
             title="Approve"
             onPress={() => onApprove?.()}
-            style={{ ...styles.button, ...styles.approveBtn }}
+            style={styles.approveAction}
           />
           <Button
             title="Reject"
             onPress={() => onReject?.()}
-            style={{ ...styles.button, ...styles.rejectBtn }}
+            style={styles.rejectAction}
             variant="outline"
           />
         </View>
@@ -78,13 +78,12 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
     marginTop: theme.spacing.sm,
   },
-  button: {
+  approveAction: {
     flex: 1,
-  },
-  approveBtn: {
     backgroundColor: theme.colors.success,
   },
-  rejectBtn: {
+  rejectAction: {
+    flex: 1,
     borderColor: theme.colors.error,
   },
 });

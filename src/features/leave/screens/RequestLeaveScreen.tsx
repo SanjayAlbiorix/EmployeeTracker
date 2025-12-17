@@ -75,7 +75,7 @@ const RequestLeaveScreen: React.FC<Props> = () => {
             onChangeText={setReason}
             placeholder="Reason for leave..."
             multiline
-            style={{ height: 100 }}
+            style={styles.textArea}
         />
 
         <Button 
@@ -108,6 +108,9 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: theme.spacing.md,
+  },
+  textArea: {
+    height: 100,
   }
 });
 

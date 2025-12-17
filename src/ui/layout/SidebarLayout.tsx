@@ -44,6 +44,18 @@ const SIDEBAR_ITEMS: SidebarItemConfig[] = [
     route: "Attendance",
   },
   {
+    key: "leave_requests",
+    label: "Leave Requests",
+    roles: ["admin"],
+    route: "Leaves",
+  },
+  {
+    key: "my_leaves",
+    label: "My Leaves",
+    roles: ["employee"],
+    route: "Leaves",
+  },
+  {
     key: "payroll",
     label: "Payroll",
     roles: ["admin"],
