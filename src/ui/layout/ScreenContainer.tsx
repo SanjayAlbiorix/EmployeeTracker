@@ -1,20 +1,18 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, StyleSheet } from "react-native";
+import { theme } from "../theme";
 
 type Props = {
   scroll?: boolean;
   children: React.ReactNode;
 };
 
-export default function ScreenContainer({ scroll, children }: Props) {
+const ScreenContainer: React.FC<Props> = ({ scroll = false, children }) => {
   if (scroll) {
     return (
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingBottom: 32,
-        }}
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {children}
@@ -22,5 +20,20 @@ export default function ScreenContainer({ scroll, children }: Props) {
     );
   }
 
-  return <View style={{ flex: 1 }}>{children}</View>;
-}
+  return <View style={styles.container}>{children}</View>;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: theme.spacing.xl,
+  },
+});
+
+export default ScreenContainer;

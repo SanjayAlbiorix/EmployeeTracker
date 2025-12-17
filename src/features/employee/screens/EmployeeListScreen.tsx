@@ -51,7 +51,7 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
       <ScreenContainer>
         <TopBar title="Employees" showSidebarToggle />
-        <View style={{ padding: theme.spacing.md, gap: theme.spacing.md }}>
+        <View style={styles.skeletonContainer}>
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -95,7 +95,7 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
         )}
         <View style={styles.searchContainer}>
           <View style={styles.actionRow}>
-             <View style={{ flex: 1 }}>
+             <View style={styles.flexOne}>
                 <Input
                   placeholder="Search employees..."
                   value={search}
@@ -106,7 +106,8 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
              <Button 
                 title="Add Employee" 
                 onPress={() => navigation.navigate("Employees", { screen: "AddEmployee" })}
-                style={{ height: 48, justifyContent: 'center' }} 
+                style={styles.addButton}
+ 
               />
           </View>
         </View>
@@ -117,7 +118,8 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <Text variant="md" color={theme.colors.textSecondary} style={{ textAlign: 'center', marginTop: 20 }}>
+            <Text variant="md" color={theme.colors.textSecondary} style={styles.emptyText}
+>
               No employees found.
             </Text>
           }
@@ -163,6 +165,22 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
+  skeletonContainer: {
+  padding: theme.spacing.md,
+  gap: theme.spacing.md,
+},
+flexOne: {
+  flex: 1,
+},
+addButton: {
+  height: 48,
+  justifyContent: "center",
+},
+emptyText: {
+  textAlign: "center",
+  marginTop: theme.spacing.lg,
+},
+
 });
 
 export default memo(EmployeeListScreen);
