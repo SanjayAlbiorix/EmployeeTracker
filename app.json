@@ -19,7 +19,9 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         },
-        "UIBackgroundModes": ["location"],
+        "UIBackgroundModes": [
+          "location"
+        ],
         "NSLocationWhenInUseUsageDescription": "We need your location while the app is open to provide real-time updates.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "We need your location in the background to keep tracking even when the app is closed."
       }
@@ -49,7 +51,10 @@
           "locationAlwaysAndWhenInUsePermission": "Allow ReactNativeExpoApp to access your location even when the app is closed."
         }
       ],
-      ["./plugins/with-simple-greeting"]
+      [
+        "./plugins/with-simple-greeting"
+      ],
+      "expo-sqlite"
     ]
   }
 }

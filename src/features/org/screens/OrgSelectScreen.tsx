@@ -1,0 +1,96 @@
+import React from "react";
+import { memo } from "react";
+import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { theme } from "@/ui/theme";
+import Text from "@/ui/components/Text";
+import Card from "@/ui/components/Card";
+import Button from "@/ui/components/Button";
+
+import { useOrgStore } from "@/store/orgStore";
+
+import { OrgScreenProps } from "@/types/navigation";
+
+type Props = OrgScreenProps<"OrgSelect">;
+
+const MOCK_ORGS = [
+  { id: "1", name: "Acme Corp", role: "Admin" },
+  { id: "2", name: "Globex Inc", role: "Employee" },
+];
+
+const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
+  const setOrg = useOrgStore((state) => state.setOrg);
+
+  const handleSelect = (item: typeof MOCK_ORGS[0]) => {
+      setOrg(item.id);
+      // Root navigator will transition to RoleSelect
+  };
+
+  const renderItem = ({ item }: { item: typeof MOCK_ORGS[0] }) => (
+    <TouchableOpacity onPress={() => handleSelect(item)}>
+      <Card style={styles.orgCard}>
+        <Text variant="lg" weight="bold">{item.name}</Text>
+        <Text variant="sm" color={theme.colors.textSecondary}>{item.role}</Text>
+      </Card>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text variant="xl" weight="bold" style={styles.title}>
+          Select Organization
+        </Text>
+        <Text variant="md" color={theme.colors.textSecondary} style={styles.subtitle}>
+          Choose an organization to continue
+        </Text>
+
+        <FlatList
+          data={MOCK_ORGS}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+        />
+
+        <Button 
+            title="Create New Organization" 
+            variant="outline" 
+            onPress={() => navigation.navigate("CreateOrg")} 
+            style={styles.createButton}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  content: {
+    width: "100%",
+    maxWidth: 500,
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: theme.spacing.xs,
+  },
+  subtitle: {
+    textAlign: "center",
+    marginBottom: theme.spacing.xl,
+  },
+  list: {
+    gap: theme.spacing.md,
+  },
+  orgCard: {
+    marginBottom: theme.spacing.md,
+  },
+  createButton: {
+    marginTop: theme.spacing.lg,
+  },
+});
+
+export default memo(OrgSelectScreen);
