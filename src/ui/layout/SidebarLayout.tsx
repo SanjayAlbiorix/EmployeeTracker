@@ -6,14 +6,73 @@ import Text from "../components/Text";
 
 type Props = {
   activeRoute?: string;
+  onClose?: () => void;
 };
 
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DashboardStackParamList } from "@/types/navigation";
 
-const SidebarLayout: React.FC<Props> = ({ activeRoute }) => {
+import { useRoleStore } from "@/store/roleStore";
+
+type SidebarItemConfig = {
+  key: string;
+  label: string;
+  roles: ("admin" | "employee")[];
+  route: keyof DashboardStackParamList;
+  params?: any;
+};
+
+const SIDEBAR_ITEMS: SidebarItemConfig[] = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    roles: ["admin", "employee"],
+    route: "AdminDashboard", // Ideally this should be dynamic based on role, but for now sidebar click can route to generic entry or we handle it in onPress
+  },
+  {
+    key: "employees",
+    label: "Employees",
+    roles: ["admin"],
+    route: "Employees",
+    params: { screen: "EmployeeList" },
+  },
+  {
+    key: "attendance",
+    label: "Attendance",
+    roles: ["admin", "employee"],
+    route: "Attendance",
+  },
+  {
+    key: "payroll",
+    label: "Payroll",
+    roles: ["admin"],
+    route: "AdminDashboard", // Placeholder
+  },
+];
+
+const SidebarLayout: React.FC<Props> = ({ activeRoute, onClose }) => {
   const navigation = useNavigation<NativeStackNavigationProp<DashboardStackParamList>>();
+  const role = useRoleStore((s) => s.role);
+
+  const handleNavigation = (route: keyof DashboardStackParamList, params?: any) => {
+    // @ts-ignore - navigation overloads
+    navigation.navigate(route, params);
+    onClose?.();
+  };
+
+  // Special case: Redirect "Dashboard" click based on role
+  // This is a UI-layer fix to ensure "Dashboard" link goes to the right place
+  const getRouteForRule = (item: SidebarItemConfig) => {
+      if (item.key === "dashboard") {
+          return role === "employee" ? "EmployeeDashboard" : "AdminDashboard";
+      }
+      return item.route;
+  }
+
+  const visibleItems = SIDEBAR_ITEMS.filter((item) =>
+    role ? item.roles.includes(role) : false
+  );
 
   return (
     <View style={styles.container}>
@@ -24,15 +83,15 @@ const SidebarLayout: React.FC<Props> = ({ activeRoute }) => {
       </View>
       
       <View style={styles.navContainer}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("AdminDashboard")}>
-           <Text color={theme.colors.surface}>Dashboard</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("Employees")}>
-           <Text color={theme.colors.surface}>Employees</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-           <Text color={theme.colors.surface}>Settings</Text>
-        </TouchableOpacity>
+        {visibleItems.map((item) => (
+            <TouchableOpacity 
+                key={item.key} 
+                style={styles.navItem} 
+                onPress={() => handleNavigation(getRouteForRule(item), item.params)}
+            >
+                <Text color={theme.colors.surface}>{item.label}</Text>
+            </TouchableOpacity>
+        ))}
       </View>
     </View>
   );

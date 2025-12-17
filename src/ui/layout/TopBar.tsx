@@ -6,22 +6,31 @@ import { theme } from "../theme";
 import Text from "../components/Text";
 // import Avatar from "../components/Avatar"; // Placeholder for now
 
+import { useLayout } from "./AppLayout";
+
 type Props = {
   showBack?: boolean;
+  showSidebarToggle?: boolean;
   title?: string;
 };
 
-const TopBar: React.FC<Props> = ({ showBack = false, title = "HRMS App" }) => {
+const TopBar: React.FC<Props> = ({ showBack = false, showSidebarToggle = false, title = "HRMS App" }) => {
   const navigation = useNavigation();
+  const { isMobile, toggleSidebar } = useLayout();
 
   return (
     <View style={styles.container}>
       <View style={styles.leftContainer}>
-        {showBack && (
+        {showBack ? (
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
           </TouchableOpacity>
-        )}
+        ) : showSidebarToggle && isMobile ? (
+          <TouchableOpacity onPress={toggleSidebar} style={styles.backButton}>
+             <Ionicons name="menu" size={28} color={theme.colors.textPrimary} />
+          </TouchableOpacity>
+        ) : null}
+        
         <Text variant="lg" weight="bold" color={theme.colors.primary}>
           {title}
         </Text>

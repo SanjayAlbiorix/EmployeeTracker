@@ -7,6 +7,7 @@ import EmployeeInfoRow from "../components/EmployeeInfoRow";
 import { EmployeeScreenProps } from "@/types/navigation";
 import { Ionicons } from "@expo/vector-icons";
 import TopBar from "@/ui/layout/TopBar";
+import ScreenContainer from "@/ui/layout/ScreenContainer";
 
 type Props = EmployeeScreenProps<"EmployeeProfile">;
 
@@ -35,9 +36,9 @@ const EmployeeProfileScreen: React.FC<Props> = ({ route }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <ScreenContainer scroll>
       <TopBar title="Employee Profile" showBack />
-      <ScrollView contentContainerStyle={styles.container}>
+      
         <Card style={styles.headerCard}>
           <View style={styles.avatar}>
              <Ionicons name="person" size={40} color={theme.colors.textSecondary} />
@@ -76,8 +77,8 @@ const EmployeeProfileScreen: React.FC<Props> = ({ route }) => {
             <EmployeeInfoRow label="Employment Type" value="Full-Time" />
           </Card>
         </View>
-      </ScrollView>
-    </View>
+      
+    </ScreenContainer>
   );
 };
 
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xl,
     width: "100%",
     maxWidth: 600,
+    alignSelf: "center", // Center the card
   },
   avatar: {
     width: 80,
@@ -119,6 +121,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 600,
     gap: theme.spacing.sm,
+    alignSelf: "center", // Center the section
   },
   sectionTitle: {
     marginBottom: theme.spacing.xs,

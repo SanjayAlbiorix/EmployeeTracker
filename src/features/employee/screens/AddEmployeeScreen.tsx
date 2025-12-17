@@ -1,10 +1,11 @@
 import React, { memo, useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from "react-native";
 import { theme } from "@/ui/theme";
 import Text from "@/ui/components/Text";
 import Input from "@/ui/components/Input";
 import Button from "@/ui/components/Button";
 import TopBar from "@/ui/layout/TopBar";
+import ScreenContainer from "@/ui/layout/ScreenContainer";
 import { EmployeeScreenProps } from "@/types/navigation";
 
 type Props = EmployeeScreenProps<"AddEmployee">;
@@ -36,130 +37,132 @@ const AddEmployeeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <ScreenContainer scroll>
       <TopBar title="Add Employee" showBack />
-      <ScrollView contentContainerStyle={styles.container}>
-        
-        {/* Basic Information Section */}
-        <View style={styles.section}>
-          <Text variant="lg" weight="bold" style={styles.sectionTitle}>Basic Information</Text>
-          <View style={styles.card}>
-            <Input
-              label="Full Name"
-              placeholder="e.g. John Doe"
-              value={formData.fullName}
-              onChangeText={(text) => handleChange("fullName", text)}
-            />
-            <Input
-              label="Email"
-              placeholder="e.g. john@company.com"
-              value={formData.email}
-              onChangeText={(text) => handleChange("email", text)}
-              keyboardType="email-address"
-            />
-            <Input
-              label="Phone"
-              placeholder="e.g. +1 234 567 8900"
-              value={formData.phone}
-              onChangeText={(text) => handleChange("phone", text)}
-              keyboardType="phone-pad"
-            />
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+        <View style={styles.container}>
+          
+          {/* Basic Information Section */}
+          <View style={styles.section}>
+            <Text variant="lg" weight="bold" style={styles.sectionTitle}>Basic Information</Text>
+            <View style={styles.card}>
+              <Input
+                label="Full Name"
+                placeholder="e.g. John Doe"
+                value={formData.fullName}
+                onChangeText={(text) => handleChange("fullName", text)}
+              />
+              <Input
+                label="Email"
+                placeholder="e.g. john@company.com"
+                value={formData.email}
+                onChangeText={(text) => handleChange("email", text)}
+                keyboardType="email-address"
+              />
+              <Input
+                label="Phone"
+                placeholder="e.g. +1 234 567 8900"
+                value={formData.phone}
+                onChangeText={(text) => handleChange("phone", text)}
+                keyboardType="phone-pad"
+              />
+            </View>
           </View>
-        </View>
 
-        {/* Job Information Section */}
-        <View style={styles.section}>
-          <Text variant="lg" weight="bold" style={styles.sectionTitle}>Job Information</Text>
-          <View style={styles.card}>
-            <View style={styles.row}>
-              <View style={styles.halfInput}>
-                <Input
-                  label="Department"
-                  placeholder="Select Department"
-                  value={formData.department}
-                  onChangeText={(text) => handleChange("department", text)}
-                />
+          {/* Job Information Section */}
+          <View style={styles.section}>
+            <Text variant="lg" weight="bold" style={styles.sectionTitle}>Job Information</Text>
+            <View style={styles.card}>
+              <View style={styles.row}>
+                <View style={styles.halfInput}>
+                  <Input
+                    label="Department"
+                    placeholder="Select Department"
+                    value={formData.department}
+                    onChangeText={(text) => handleChange("department", text)}
+                  />
+                </View>
+                <View style={styles.halfInput}>
+                  <Input
+                    label="Designation"
+                    placeholder="e.g. Senior Developer"
+                    value={formData.designation}
+                    onChangeText={(text) => handleChange("designation", text)}
+                  />
+                </View>
               </View>
-              <View style={styles.halfInput}>
-                <Input
-                  label="Designation"
-                  placeholder="e.g. Senior Developer"
-                  value={formData.designation}
-                  onChangeText={(text) => handleChange("designation", text)}
-                />
+
+              <View style={styles.fieldContainer}>
+                <Text variant="sm" weight="medium" style={styles.label}>
+                  Employment Type
+                </Text>
+                <View style={styles.segmentedControl}>
+                  {["Full-Time", "Part-Time", "Contract"].map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.segment,
+                        formData.employmentType === type && styles.activeSegment,
+                      ]}
+                      onPress={() => handleChange("employmentType", type)}
+                    >
+                      <Text
+                        variant="sm"
+                        color={
+                          formData.employmentType === type
+                            ? theme.colors.surface
+                            : theme.colors.textSecondary
+                        }
+                        weight={formData.employmentType === type ? "bold" : "regular"}
+                      >
+                        {type}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
             </View>
+          </View>
 
-            <View style={styles.fieldContainer}>
-              <Text variant="sm" weight="medium" style={styles.label}>
-                Employment Type
-              </Text>
-              <View style={styles.segmentedControl}>
-                {["Full-Time", "Part-Time", "Contract"].map((type) => (
+          {/* Status Section */}
+          <View style={styles.section}>
+            <Text variant="lg" weight="bold" style={styles.sectionTitle}>Status</Text>
+            <View style={styles.card}>
+               <View style={styles.row}>
+                {["Active", "Inactive"].map((status) => (
                   <TouchableOpacity
-                    key={type}
-                    style={[
-                      styles.segment,
-                      formData.employmentType === type && styles.activeSegment,
-                    ]}
-                    onPress={() => handleChange("employmentType", type)}
+                    key={status}
+                    style={styles.radioOption}
+                    onPress={() => handleChange("status", status)}
                   >
-                    <Text
-                      variant="sm"
-                      color={
-                        formData.employmentType === type
-                          ? theme.colors.surface
-                          : theme.colors.textSecondary
-                      }
-                      weight={formData.employmentType === type ? "bold" : "regular"}
-                    >
-                      {type}
-                    </Text>
+                    <View style={[styles.radioCircle, formData.status === status && styles.radioSelected]} />
+                    <Text variant="md">{status}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Status Section */}
-        <View style={styles.section}>
-          <Text variant="lg" weight="bold" style={styles.sectionTitle}>Status</Text>
-          <View style={styles.card}>
-             <View style={styles.row}>
-              {["Active", "Inactive"].map((status) => (
-                <TouchableOpacity
-                  key={status}
-                  style={styles.radioOption}
-                  onPress={() => handleChange("status", status)}
-                >
-                  <View style={[styles.radioCircle, formData.status === status && styles.radioSelected]} />
-                  <Text variant="md">{status}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+          <View style={styles.actions}>
+            <Button
+              title="Cancel"
+              variant="outline"
+              onPress={() => navigation.goBack()}
+              style={{ flex: 1 }}
+              disabled={isSubmitting}
+            />
+            <Button
+              title={isSubmitting ? "Adding..." : "Add Employee"}
+              variant="primary"
+              onPress={handleSubmit}
+              style={{ flex: 1 }}
+              disabled={isSubmitting}
+            />
           </View>
-        </View>
 
-        <View style={styles.actions}>
-          <Button
-            title="Cancel"
-            variant="outline"
-            onPress={() => navigation.goBack()}
-            style={{ flex: 1 }}
-            disabled={isSubmitting}
-          />
-          <Button
-            title={isSubmitting ? "Adding..." : "Add Employee"}
-            variant="primary"
-            onPress={handleSubmit}
-            style={{ flex: 1 }}
-            disabled={isSubmitting}
-          />
         </View>
-
-      </ScrollView>
-    </View>
+      </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 };
 

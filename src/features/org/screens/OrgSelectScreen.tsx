@@ -5,6 +5,8 @@ import { theme } from "@/ui/theme";
 import Text from "@/ui/components/Text";
 import Card from "@/ui/components/Card";
 import Button from "@/ui/components/Button";
+import ScreenContainer from "@/ui/layout/ScreenContainer";
+import EmptyState from "@/ui/components/EmptyState";
 
 import { useOrgStore } from "@/store/orgStore";
 
@@ -34,9 +36,23 @@ const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  // Placeholder for organizations state
+  const organizations: any[] = []; 
+
+  if (organizations.length === 0) {
+    return (
+      <EmptyState
+        title="No organizations found"
+        description="Create an organization to continue."
+        actionLabel="Create Organization"
+        onAction={() => navigation.navigate("CreateOrg")}
+      />
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
+    <ScreenContainer>
+      <View style={styles.container}>
         <Text variant="xl" weight="bold" style={styles.title}>
           Select Organization
         </Text>
@@ -58,7 +74,7 @@ const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
             style={styles.createButton}
         />
       </View>
-    </View>
+    </ScreenContainer>
   );
 };
 

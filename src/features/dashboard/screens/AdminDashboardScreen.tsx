@@ -4,18 +4,34 @@ import { theme } from "@/ui/theme";
 import Text from "@/ui/components/Text";
 import StatCard from "../components/StatCard";
 import QuickActionCard from "../components/QuickActionCard";
+import TopBar from "@/ui/layout/TopBar";
+import ScreenContainer from "@/ui/layout/ScreenContainer";
+import SkeletonCard from "@/ui/components/SkeletonCard";
 
 import { DashboardScreenProps } from "@/types/navigation";
 
 type Props = DashboardScreenProps<"AdminDashboard">;
 
 const AdminDashboardScreen: React.FC<Props> = ({ navigation }) => {
+  const isLoading = false;
+
+  if (isLoading) {
+    return (
+      <ScreenContainer>
+        <TopBar title="Admin Dashboard" showSidebarToggle />
+        <View style={{ padding: theme.spacing.md, gap: theme.spacing.md }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+      </ScreenContainer>
+    );
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text variant="xl" weight="bold">Admin Dashboard</Text>
-        <Text variant="md" color={theme.colors.textSecondary}>Overview of your organization</Text>
-      </View>
+    <ScreenContainer scroll>
+      <TopBar title="Admin Dashboard" showSidebarToggle />
+      <View style={styles.scrollContent}>
 
       <View style={styles.section}>
         <Text variant="lg" weight="bold" style={styles.sectionTitle}>Key Metrics</Text>
@@ -30,23 +46,25 @@ const AdminDashboardScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.section}>
         <Text variant="lg" weight="bold" style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.grid}>
-          <QuickActionCard title="Add Employee" icon="person-add" onPress={() => navigation.navigate("Employees")} />
+          <QuickActionCard title="Add Employee" icon="person-add" onPress={() => navigation.navigate("Employees", { screen: "AddEmployee" })} />
           <QuickActionCard title="Approve Leave" icon="checkmark-circle" onPress={() => {}} />
           <QuickActionCard title="Run Payroll" icon="cash" onPress={() => {}} />
           <QuickActionCard title="Settings" icon="settings" onPress={() => {}} />
         </View>
       </View>
-    </ScrollView>
+      </View>
+    </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  scrollContent: {
     padding: theme.spacing.md,
     gap: theme.spacing.xl,
-  },
-  header: {
-    marginBottom: theme.spacing.sm,
   },
   section: {
     gap: theme.spacing.md,
@@ -56,7 +74,7 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "wrap", // Enable wrapping
     gap: theme.spacing.md,
   },
 });

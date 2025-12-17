@@ -7,6 +7,10 @@ import Button from "@/ui/components/Button";
 import EmployeeCard from "../components/EmployeeCard";
 import { EmployeeScreenProps } from "@/types/navigation";
 import TopBar from "@/ui/layout/TopBar";
+import ScreenContainer from "@/ui/layout/ScreenContainer";
+import EmptyState from "@/ui/components/EmptyState";
+import SkeletonCard from "@/ui/components/SkeletonCard";
+import RequireAdmin from "@/ui/guards/RequireAdmin";
 
 // Mock Data
 const MOCK_EMPLOYEES = [
@@ -21,8 +25,11 @@ type Props = EmployeeScreenProps<"EmployeeList">;
 
 const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
   const [search, setSearch] = useState("");
-
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // UI States
+  const isLoading = false;
+  const employees = MOCK_EMPLOYEES;
 
   React.useEffect(() => {
     if (route.params?.newEmployee) {
@@ -34,11 +41,38 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, [route.params?.newEmployee]);
 
-  const filteredEmployees = MOCK_EMPLOYEES.filter(
+  const filteredEmployees = employees.filter(
     (emp) =>
       emp.name.toLowerCase().includes(search.toLowerCase()) ||
       emp.department.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <ScreenContainer>
+        <TopBar title="Employees" showSidebarToggle />
+        <View style={{ padding: theme.spacing.md, gap: theme.spacing.md }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+      </ScreenContainer>
+    );
+  }
+
+  if (employees.length === 0) {
+    return (
+      <RequireAdmin>
+        <TopBar title="Employees" showSidebarToggle />
+        <EmptyState
+          title="No employees yet"
+          description="Add your first employee to get started."
+          actionLabel="Add Employee"
+          onAction={() => navigation.navigate("Employees", { screen: "AddEmployee" })}
+        />
+      </RequireAdmin>
+    );
+  }
 
   const renderItem = ({ item }: { item: typeof MOCK_EMPLOYEES[0] }) => (
     <EmployeeCard
@@ -50,8 +84,9 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <TopBar title="Employees" />
+    <RequireAdmin>
+    <ScreenContainer scroll={false}>
+      <TopBar title="Employees" showSidebarToggle />
       <View style={styles.container}>
         {showSuccess && (
             <View style={styles.successBanner}>
@@ -67,11 +102,12 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
                   onChangeText={setSearch}
                 />
              </View>
+             {/* Redundant check if RequireAdmin guards the screen, but safe to keep */}
              <Button 
                 title="Add Employee" 
-                onPress={() => navigation.navigate("AddEmployee")}
+                onPress={() => navigation.navigate("Employees", { screen: "AddEmployee" })}
                 style={{ height: 48, justifyContent: 'center' }} 
-             />
+              />
           </View>
         </View>
 
@@ -87,7 +123,8 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
           }
         />
       </View>
-    </View>
+    </ScreenContainer>
+    </RequireAdmin>
   );
 };
 
@@ -104,21 +141,17 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     marginBottom: theme.spacing.md,
-    maxWidth: 600,
     width: "100%",
-    alignSelf: "center",
   },
   actionRow: {
     flexDirection: "row",
     gap: theme.spacing.md,
-    alignItems: "flex-start", // Align top so button matches input height if necessary, or center
+    alignItems: "flex-start",
   },
   list: {
     gap: theme.spacing.md,
     paddingBottom: theme.spacing.xl,
-    maxWidth: 800,
     width: "100%",
-    alignSelf: "center",
   },
   successBanner: {
     backgroundColor: theme.colors.surface,
@@ -127,9 +160,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     marginBottom: theme.spacing.md,
     borderRadius: theme.spacing.sm,
-    maxWidth: 600,
     width: "100%",
-    alignSelf: "center",
     alignItems: "center",
   },
 });

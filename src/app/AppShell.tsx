@@ -1,6 +1,6 @@
 import React from "react";
 import { memo } from "react";
-import ResponsiveLayout from "../ui/layout/ResponsiveLayout";
+import { AppLayout } from "../ui/layout/AppLayout";
 import { StatusBar } from "expo-status-bar";
 
 type Props = {
@@ -9,10 +9,10 @@ type Props = {
 
 const AppShell: React.FC<Props> = ({ children }) => {
   return (
-    <ResponsiveLayout>
+    <AppLayout>
       {children}
       <StatusBar style="auto" />
-    </ResponsiveLayout>
+    </AppLayout>
   );
 };
 

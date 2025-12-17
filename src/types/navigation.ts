@@ -1,4 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NavigatorScreenParams, CompositeScreenProps } from "@react-navigation/native";
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -15,7 +16,13 @@ export type OrgStackParamList = {
 export type DashboardStackParamList = {
   AdminDashboard: undefined;
   EmployeeDashboard: undefined;
-  Employees: undefined;
+  Employees: {
+    screen?: keyof EmployeeStackParamList;
+    params?: EmployeeStackParamList[keyof EmployeeStackParamList];
+  };
+  Attendance: undefined;
+  Leaves: undefined;
+  RequestLeave: undefined;
 };
 
 export type EmployeeStackParamList = {
@@ -35,4 +42,7 @@ export type DashboardScreenProps<T extends keyof DashboardStackParamList> =
   NativeStackScreenProps<DashboardStackParamList, T>;
 
 export type EmployeeScreenProps<T extends keyof EmployeeStackParamList> =
-  NativeStackScreenProps<EmployeeStackParamList, T>;
+  CompositeScreenProps<
+    NativeStackScreenProps<EmployeeStackParamList, T>,
+    NativeStackScreenProps<DashboardStackParamList>
+  >;

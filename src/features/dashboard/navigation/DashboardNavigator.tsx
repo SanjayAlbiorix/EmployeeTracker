@@ -10,8 +10,14 @@ import { DashboardStackParamList } from "@/types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import EmployeeNavigator from "@/features/employee/navigation/EmployeeNavigator";
+import AdminAttendanceScreen from "@/features/attendance/screens/AdminAttendanceScreen";
+import EmployeeAttendanceScreen from "@/features/attendance/screens/EmployeeAttendanceScreen";
+import AdminLeaveScreen from "@/features/leave/screens/AdminLeaveScreen";
+import EmployeeLeaveScreen from "@/features/leave/screens/EmployeeLeaveScreen";
+import RequestLeaveScreen from "@/features/leave/screens/RequestLeaveScreen";
 
 import { createStackNavigator } from "@react-navigation/stack";
+import { theme } from "@/ui/theme";
 
 const Stack = createStackNavigator<DashboardStackParamList>();
 
@@ -27,19 +33,27 @@ const DashboardNavigator = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
         <Stack.Screen name="Employees" component={EmployeeNavigator} />
+        <Stack.Screen name="Attendance" component={AdminAttendanceScreen} />
+        <Stack.Screen name="Leaves" component={AdminLeaveScreen} />
       </Stack.Navigator>
     );
   }
 
   if (role === "employee") {
-    // Employee flow remains simple for now
-    return <EmployeeDashboardScreen navigation={navigation as unknown as NativeStackNavigationProp<DashboardStackParamList, "EmployeeDashboard">} route={employeeRoute} />;
+    return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="EmployeeDashboard" component={EmployeeDashboardScreen} />
+        <Stack.Screen name="Attendance" component={EmployeeAttendanceScreen} />
+        <Stack.Screen name="Leaves" component={EmployeeLeaveScreen} />
+        <Stack.Screen name="RequestLeave" component={RequestLeaveScreen} />
+      </Stack.Navigator>
+    );
   }
 
-  // Fallback if role is somehow missing despite navigation logic
+  // Fallback
   return (
     <View style={styles.container}>
-        <Text variant="md" color="red">Error: No role selected.</Text>
+        <Text variant="md" color={theme.colors.error}>Error: No role selected.</Text>
     </View>
   );
 };
