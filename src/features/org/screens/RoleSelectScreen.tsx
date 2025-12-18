@@ -5,13 +5,9 @@ import Text from "@/ui/components/Text";
 import Card from "@/ui/components/Card";
 import { useRoleStore } from "@/store/roleStore";
 
-import { OrgScreenProps } from "@/types/navigation";
 
-type Props = OrgScreenProps<"RoleSelect"> & {
-  onRoleSelect?: (role: "admin" | "employee") => void;
-};
 
-const RoleSelectScreen: React.FC<Props> = ({ navigation, onRoleSelect }) => {
+const RoleSelectScreen: React.FC = () => {
   const setRole = useRoleStore((state) => state.setRole);
 
   const handleAdminSelect = () => {

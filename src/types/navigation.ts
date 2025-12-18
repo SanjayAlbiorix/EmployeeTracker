@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { NavigatorScreenParams, CompositeScreenProps } from "@react-navigation/native";
 
 export type AuthStackParamList = {
+  Landing: undefined;
   Login: undefined;
   Signup: undefined;
   Verify: undefined;
@@ -10,7 +11,7 @@ export type AuthStackParamList = {
 export type OrgStackParamList = {
   OrgSelect: undefined;
   CreateOrg: undefined;
-  RoleSelect: undefined;
+  JoinOrg: undefined;
 };
 
 export type DashboardStackParamList = {
@@ -25,13 +26,16 @@ export type DashboardStackParamList = {
   RequestLeave: undefined;
   Payroll: undefined;
   PayrollRun: undefined;
+  PayrollList: undefined;
   Payslip: undefined;
+  PayslipList: undefined;
+  OrgSettings: undefined;
+  ProfileSettings: undefined;
 };
 
 export type EmployeeStackParamList = {
-  EmployeeList: { newEmployee?: boolean } | undefined;
+  EmployeeList: undefined;
   EmployeeProfile: { employeeId: string };
-  AddEmployee: undefined;
 };
 
 /* Screen prop helpers */

@@ -1,6 +1,6 @@
 import React from "react";
 import { memo } from "react";
-import { TouchableOpacity, StyleSheet, ActivityIndicator, ViewStyle } from "react-native";
+import { TouchableOpacity, StyleSheet, ActivityIndicator, ViewStyle, StyleProp } from "react-native";
 import { theme } from "../theme";
 import Text from "./Text";
 
@@ -10,7 +10,7 @@ type Props = {
   variant?: "primary" | "secondary" | "outline";
   disabled?: boolean;
   loading?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 };
 
 const Button: React.FC<Props> = ({

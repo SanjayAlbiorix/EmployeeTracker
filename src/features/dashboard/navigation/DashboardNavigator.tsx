@@ -18,6 +18,10 @@ import RequestLeaveScreen from "@/features/leave/screens/RequestLeaveScreen";
 import AdminPayrollScreen from "@/features/payroll/screens/AdminPayrollScreen";
 import PayrollRunScreen from "@/features/payroll/screens/PayrollRunScreen";
 import EmployeePayslipScreen from "@/features/payroll/screens/EmployeePayslipScreen";
+import OrgSettingsScreen from "@/features/org/screens/OrgSettingsScreen";
+import ProfileSettingsScreen from "@/features/employee/screens/ProfileSettingsScreen";
+import PayrollListScreen from "@/features/payroll/screens/PayrollListScreen";
+import PayslipListScreen from "@/features/payroll/screens/PayslipListScreen";
 
 import { createStackNavigator } from "@react-navigation/stack";
 import { theme } from "@/ui/theme";
@@ -28,9 +32,7 @@ const DashboardNavigator = () => {
   const role = useRoleStore((state) => state.role);
   const navigation = useNavigation<NativeStackNavigationProp<DashboardStackParamList>>();
   
-  // Mock route for employee since they are rendered directly
-  const employeeRoute = { key: 'EmployeeDashboard', name: 'EmployeeDashboard' } as any;
-
+  
   if (role === "admin") {
     return (
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -40,6 +42,8 @@ const DashboardNavigator = () => {
         <Stack.Screen name="Leaves" component={AdminLeaveScreen} />
         <Stack.Screen name="Payroll" component={AdminPayrollScreen} />
         <Stack.Screen name="PayrollRun" component={PayrollRunScreen} />
+        <Stack.Screen name="OrgSettings" component={OrgSettingsScreen} />
+        <Stack.Screen name="PayrollList" component={PayrollListScreen} />
       </Stack.Navigator>
     );
   }
@@ -52,6 +56,8 @@ const DashboardNavigator = () => {
         <Stack.Screen name="Leaves" component={EmployeeLeaveScreen} />
         <Stack.Screen name="RequestLeave" component={RequestLeaveScreen} />
         <Stack.Screen name="Payslip" component={EmployeePayslipScreen} />
+        <Stack.Screen name="PayslipList" component={PayslipListScreen} />
+        <Stack.Screen name="ProfileSettings" component={ProfileSettingsScreen} />
       </Stack.Navigator>
     );
   }

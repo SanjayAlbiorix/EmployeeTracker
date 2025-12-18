@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import VerifyScreen from "../screens/VerifyScreen";
+import LandingScreen from "../../landing/screens/LandingScreen";
 
 import { AuthStackParamList } from "@/types/navigation";
 
@@ -11,7 +12,8 @@ const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Landing">
+      <Stack.Screen name="Landing" component={LandingScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="Verify" component={VerifyScreen} />

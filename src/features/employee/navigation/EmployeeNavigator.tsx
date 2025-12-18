@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { EmployeeStackParamList } from "@/types/navigation";
 import EmployeeListScreen from "../screens/EmployeeListScreen";
 import EmployeeProfileScreen from "../screens/EmployeeProfileScreen";
-import AddEmployeeScreen from "../screens/AddEmployeeScreen";
+
 
 const Stack = createStackNavigator<EmployeeStackParamList>();
 
@@ -12,7 +12,6 @@ const EmployeeNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="EmployeeList">
       <Stack.Screen name="EmployeeList" component={EmployeeListScreen} />
       <Stack.Screen name="EmployeeProfile" component={EmployeeProfileScreen} />
-      <Stack.Screen name="AddEmployee" component={AddEmployeeScreen} />
     </Stack.Navigator>
   );
 };

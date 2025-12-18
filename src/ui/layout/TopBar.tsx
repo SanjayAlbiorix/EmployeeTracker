@@ -12,9 +12,10 @@ type Props = {
   showBack?: boolean;
   showSidebarToggle?: boolean;
   title?: string;
+  subtitle?: string;
 };
 
-const TopBar: React.FC<Props> = ({ showBack = false, showSidebarToggle = false, title = "HRMS App" }) => {
+const TopBar: React.FC<Props> = ({ showBack = false, showSidebarToggle = false, title = "HRMS App", subtitle }) => {
   const navigation = useNavigation();
   const { isMobile, toggleSidebar } = useLayout();
 
@@ -31,9 +32,16 @@ const TopBar: React.FC<Props> = ({ showBack = false, showSidebarToggle = false, 
           </TouchableOpacity>
         ) : null}
         
-        <Text variant="lg" weight="bold" color={theme.colors.primary}>
-          {title}
-        </Text>
+        <View>
+          <Text variant="lg" weight="bold" color={theme.colors.primary}>
+            {title}
+          </Text>
+          {subtitle && (
+            <Text variant="sm" color={theme.colors.textSecondary}>
+              {subtitle}
+            </Text>
+          )}
+        </View>
       </View>
       <View style={styles.avatarPlaceholder} />
     </View>

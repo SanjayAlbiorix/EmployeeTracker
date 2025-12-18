@@ -11,6 +11,7 @@ import UnauthenticatedLayout from "../ui/layout/UnauthenticatedLayout";
 import VerifyScreen from "../features/auth/screens/VerifyScreen";
 import RoleSelectScreen from "../features/org/screens/RoleSelectScreen";
 import DashboardNavigator from "../features/dashboard/navigation/DashboardNavigator";
+import LoadingScreen from "../ui/screens/LoadingScreen";
 import { useAuthStore } from "../store/authStore";
 import { useOrgStore } from "../store/orgStore";
 import { useRoleStore } from "../store/roleStore";
@@ -41,13 +42,13 @@ const Navigation: React.FC = () => {
          <UnauthenticatedLayout>
             <VerifyScreen navigation={dummyNavigation} route={dummyRoute} /> 
          </UnauthenticatedLayout>
+      ) : !role ? (
+         <UnauthenticatedLayout>
+            <RoleSelectScreen />
+         </UnauthenticatedLayout>
       ) : !orgId ? (
          <UnauthenticatedLayout>
             <OrgNavigator />
-         </UnauthenticatedLayout>
-      ) : !role ? (
-         <UnauthenticatedLayout>
-            <RoleSelectScreen navigation={dummyNavigation} route={dummyRoute} />
          </UnauthenticatedLayout>
       ) : (
          <AppShell>
