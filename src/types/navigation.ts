@@ -5,7 +5,7 @@ export type AuthStackParamList = {
   Landing: undefined;
   Login: undefined;
   Signup: undefined;
-  Verify: undefined;
+  Verify: { email?: string } | undefined;
 };
 
 export type OrgStackParamList = {

@@ -9,8 +9,11 @@ import { useAuthStore } from '../../../store/authStore';
 
 const JoinOrgScreen = () => {
     const [orgCode, setOrgCode] = useState('');
-    const [loading, setLoading] = useState(false);
-    const setOrg = useOrgStore(state => state.setOrg);
+    // We use store's loading state, but we also have local loading?
+    // Store handles loading for join action. Use store's isLoading if we can expose it.
+    // User instruction: "Replace mock logic... On submit: await joinOrganization(code)"
+    const joinOrganization = useOrgStore(state => state.joinOrganization);
+    const isLoading = useOrgStore(state => state.isLoading);
     const logout = useAuthStore(state => state.logout);
 
     const handleJoin = async () => {
@@ -19,19 +22,9 @@ const JoinOrgScreen = () => {
             return;
         }
 
-        setLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setLoading(false);
-            if (orgCode === 'INVALID') {
-                Alert.alert('Error', 'Invalid organization code');
-            } else {
-                // In real app, we would verify code and get Org ID
-                // For now, assume code is OrgID or similar
-                setOrg('org_joined_123');
-                Alert.alert('Success', 'Successfully joined organization!');
-            }
-        }, 1500);
+        await joinOrganization(orgCode);
+        // On success: Let root navigation proceed automatically (orgId set)
+        // On error: console.error only (handled in store)
     };
 
     return (
@@ -61,7 +54,7 @@ const JoinOrgScreen = () => {
                     <Button 
                         title="Join Organization" 
                         onPress={handleJoin} 
-                        loading={loading}
+                        loading={isLoading}
                         variant="primary"
                         style={styles.button}
                     />

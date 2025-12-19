@@ -14,11 +14,25 @@ import { OrgScreenProps } from "@/types/navigation";
 type Props = OrgScreenProps<"CreateOrg">;
 
 const CreateOrgScreen: React.FC<Props> = ({ navigation }) => {
-  const setOrg = useOrgStore((s) => s.setOrg);
+  const createOrganization = useOrgStore((state) => state.createOrganization);
+  const isLoading = useOrgStore((state) => state.isLoading);
 
-  const handleCreateOrg = () => {
-    const newOrgId = `org-${Date.now()}`; // mock id
-    setOrg(newOrgId);
+  console.log('isLoading', isLoading)
+
+
+  // Local state for name input
+  const [orgName, setOrgName] = React.useState("");
+
+  const handleCreateOrg = async () => {
+    if (!orgName) return;
+    await createOrganization(orgName);
+    // Navigation is handled automatically by root navigator observing orgId change if successful
+    // Or we might need to manually go back if the orgId wasn't set?
+    // User Instructions: "After success: Do NOT navigate manually. Let root navigation react to updated orgId"
+    // But createOrganization sets orgId. 
+    // Wait, CreateOrgScreen is likely in OrgNavigator stack.
+    // If orgId is set, Root Navigation switches to AppShell/Dashboard. 
+    // So "Do NOT navigate manually" is correct.
   };
 
   return (
@@ -31,12 +45,18 @@ const CreateOrgScreen: React.FC<Props> = ({ navigation }) => {
           Set up your company profile
         </Text>
 
-        <Input label="Organization Name" placeholder="e.g. Acme Corp" />
+        <Input 
+            label="Organization Name" 
+            placeholder="e.g. Acme Corp" 
+            value={orgName}
+            onChangeText={setOrgName}
+        />
         <Input label="Industry" placeholder="Select Industry" />
 
         <Button 
-            title="Create & Continue" 
+            title={isLoading ? "Creating..." : "Create & Continue"}
             onPress={handleCreateOrg} 
+            loading={isLoading}
             style={styles.button} 
         />
         

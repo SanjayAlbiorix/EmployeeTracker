@@ -14,35 +14,35 @@ import { OrgScreenProps } from "@/types/navigation";
 
 type Props = OrgScreenProps<"OrgSelect">;
 
-const MOCK_ORGS = [
-  { id: "1", name: "Acme Corp", role: "Admin" },
-  { id: "2", name: "Globex Inc", role: "Employee" },
-];
-
 const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
   const setOrg = useOrgStore((state) => state.setOrg);
+  const fetchOrganizations = useOrgStore((state) => state.fetchOrganizations);
+  const organizations = useOrgStore((state) => state.organizations);
+  const orgId = useOrgStore(state => state.orgId);
+  const isLoading = useOrgStore((state) => state.isLoading);
 
-  const handleSelect = (item: typeof MOCK_ORGS[0]) => {
-      setOrg(item.id);
-      // Root navigator will transition to RoleSelect
+  React.useEffect(() => {
+        fetchOrganizations();
+  }, []);
+
+  const handleSelect = (item: typeof organizations[0]) => {
+      setOrg(item);
+      // Root navigator will transition to Dashboard (via Role check? No, orgId check in Navigation.tsx)
   };
 
-  const renderItem = ({ item }: { item: typeof MOCK_ORGS[0] }) => (
+  const renderItem = ({ item }: { item: typeof organizations[0] }) => (
     <TouchableOpacity onPress={() => handleSelect(item)}>
       <Card style={styles.orgCard}>
         <Text variant="lg" weight="bold">{item.name}</Text>
         <Text variant="sm" color={theme.colors.textSecondary}>{item.role}</Text>
       </Card>
     </TouchableOpacity>
-  );
+  ); 
 
-  // Placeholder for organizations state
-  const organizations: any[] = []; 
-
-  if (organizations.length === 0) {
+  if (!organizations?.length) {
     return (
       <EmptyState
-        title="No organizations found"
+        title={ isLoading ? 'Loading...' : "No organizations found"}
         description="Create an organization to continue."
         actionLabel="Create Organization"
         onAction={() => navigation.navigate("CreateOrg")}
@@ -61,7 +61,7 @@ const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
         </Text>
 
         <FlatList
-          data={MOCK_ORGS}
+          data={organizations}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}

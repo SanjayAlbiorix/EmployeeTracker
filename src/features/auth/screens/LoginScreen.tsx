@@ -7,19 +7,48 @@ import Input from "@/ui/components/Input";
 import Button from "@/ui/components/Button";
 import Card from "@/ui/components/Card";
 
-import { useAuthStore } from "@/store/authStore";
+
+import { supabase } from "@/lib/supabaseClient";
 
 import { AuthScreenProps } from "@/types/navigation";
 
 type Props = AuthScreenProps<"Login">;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const login = useAuthStore((state) => state.login);
+  // Local state for form inputs
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  const handleLogin = () => {
-    login();
-    // Navigation will be handled by the root navigator listening to state changes
-  };
+ const handleLogin = async () => {
+  if (!email || !password) {
+    alert("Please enter both email and password");
+    return;
+  }
+
+  setLoading(true);
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  setLoading(false);
+
+  if (error) {
+    // 🔴 IMPORTANT: Handle unverified users
+    if (error.message.toLowerCase().includes("email not confirmed")) {
+      navigation.navigate("Verify", { email });
+      return;
+    }
+
+    alert(error.message);
+    return;
+  }
+
+  // ✅ Verified users proceed via authStore listener
+};
+
 
   return (
     <View style={styles.container}>
@@ -31,13 +60,26 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           Sign in to your account
         </Text>
 
-        <Input label="Email" placeholder="Enter your email" />
-        <Input label="Password" placeholder="Enter your password" secureTextEntry />
+        <Input 
+            label="Email" 
+            placeholder="Enter your email" 
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+        />
+        <Input 
+            label="Password" 
+            placeholder="Enter your password" 
+            secureTextEntry 
+            value={password}
+            onChangeText={setPassword}
+        />
 
         <Button 
-            title="Sign In" 
+            title={loading ? "Signing in..." : "Sign In"}
             onPress={handleLogin} 
-            style={styles.button} 
+            style={styles.button}
+            disabled={loading}
         />
 
         <TouchableOpacity onPress={() => navigation.navigate("Signup")}>

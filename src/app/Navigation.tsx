@@ -19,43 +19,44 @@ import { useRoleStore } from "../store/roleStore";
 import { useNavigation } from "@react-navigation/native";
 
 const Navigation: React.FC = () => {
-    // We use a cast here because these screens are rendered conditionally outside a navigator
-    // but strict typing enforces navigation/route props.
-    // Since they are conditionally rendered at root, they don't have a history stack in this context.
     const dummyNavigation = { navigate: () => {}, goBack: () => {} } as any;
-    const dummyRoute = { key: 'dummy', name: 'dummy' } as any;
+    const dummyRoute = { key: 'dummy', name: 'Verify'} as any;
 
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const isVerified = useAuthStore((state) => state.isVerified);
+    const isLoading = useAuthStore((state) => state.isLoading);
     const orgId = useOrgStore((state) => state.orgId);
     const role = useRoleStore((state) => state.role);
 
-    // Initial check or loading state could be added here if needed for hydration
+    if (isLoading) {
+        return <LoadingScreen />;
+    }
     
   return (
-    <>
-      {!isAuthenticated ? (
-         <UnauthenticatedLayout>
-            <AuthNavigator />
-         </UnauthenticatedLayout>
-      ) : !isVerified ? (
-         <UnauthenticatedLayout>
-            <VerifyScreen navigation={dummyNavigation} route={dummyRoute} /> 
-         </UnauthenticatedLayout>
-      ) : !role ? (
-         <UnauthenticatedLayout>
-            <RoleSelectScreen />
-         </UnauthenticatedLayout>
-      ) : !orgId ? (
-         <UnauthenticatedLayout>
-            <OrgNavigator />
-         </UnauthenticatedLayout>
-      ) : (
-         <AppShell>
-            <DashboardNavigator />
-         </AppShell>
-      )}
-    </>
+      <>
+    {!isAuthenticated ? (
+      <UnauthenticatedLayout>
+        <AuthNavigator />
+      </UnauthenticatedLayout>
+    ) : !isVerified ? (
+      <UnauthenticatedLayout>
+        <VerifyScreen navigation={dummyNavigation} route={dummyRoute} />
+      </UnauthenticatedLayout>
+    ) : !role ? (
+      <UnauthenticatedLayout>
+        <RoleSelectScreen />
+      </UnauthenticatedLayout>
+    ) : !orgId ? (
+      <UnauthenticatedLayout>
+        <OrgNavigator />
+      </UnauthenticatedLayout>
+    ) : (
+      <AppShell>
+        <DashboardNavigator />
+      </AppShell>
+    )}
+  </>
+
   );
 };
 
