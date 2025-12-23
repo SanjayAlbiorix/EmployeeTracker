@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { supabase } from "@/lib/supabaseClient";
+import { useRoleStore } from "./roleStore";
+import { useOrgStore } from "./orgStore";
 
 interface AuthState {
   session: any | null;
@@ -42,7 +44,17 @@ export const useAuthStore = create<AuthState>((set) => {
     isAuthenticated: false,
     isVerified: false,
     logout: async () => {
+      
+      useRoleStore.getState().setRole(null);
+  useOrgStore.getState().clearOrg();
       await supabase.auth.signOut();
+      set({ 
+        session: null, 
+        user: null, 
+        isAuthenticated: false, 
+        isVerified: false, 
+        isLoading: false 
+      });
     },
   };
 });
