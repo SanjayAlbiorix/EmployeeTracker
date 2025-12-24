@@ -10,7 +10,7 @@ import TopBar from "@/ui/layout/TopBar";
 import ScreenContainer from "@/ui/layout/ScreenContainer";
 import EmptyState from "@/ui/components/EmptyState";
 import SkeletonCard from "@/ui/components/SkeletonCard";
-import RequireAdmin from "@/ui/guards/RequireAdmin";
+import { useRoleStore } from "@/store/roleStore";
 
 // Mock Data
 const MOCK_EMPLOYEES = [
@@ -25,6 +25,8 @@ type Props = EmployeeScreenProps<"EmployeeList">;
 
 const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
   const [search, setSearch] = useState("");
+  const role = useRoleStore((state) => state.role);
+  const isAdmin = role === 'admin';
 
   // UI States
   const isLoading = false;
@@ -51,13 +53,26 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
 
   if (employees.length === 0) {
     return (
-      <RequireAdmin>
+      <ScreenContainer>
         <TopBar title="Employees" showSidebarToggle />
-        <EmptyState
-          title="No employees yet"
-          description="Employees will appear here once they join the organization."
-        />
-      </RequireAdmin>
+        {isAdmin ? (
+            <EmptyState
+            title="No employees yet"
+            description="Invite employees to your organization"
+            actionLabel="Invite Employee"
+            onAction={() => {
+                // Button does nothing yet
+                console.log("Invite clicked");
+            }}
+            />
+        ) : (
+             <View style={styles.emptyContainer}>
+                <Text variant="md" color={theme.colors.textSecondary} style={styles.emptyText}>
+                    No employees found.
+                </Text>
+             </View>
+        )}
+      </ScreenContainer>
     );
   }
 
@@ -71,7 +86,6 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 
   return (
-    <RequireAdmin>
     <ScreenContainer scroll={false}>
       <TopBar title="Employees" showSidebarToggle />
       <View style={styles.container}>
@@ -84,6 +98,13 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
                   onChangeText={setSearch}
                 />
              </View>
+             {isAdmin && (
+                 <Button 
+                    title="Invite Employee" 
+                    onPress={() => console.log("Invite clicked")}
+                    style={styles.inviteButton}
+                 />
+             )}
           </View>
         </View>
 
@@ -93,15 +114,13 @@ const EmployeeListScreen: React.FC<Props> = ({ navigation, route }) => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <Text variant="md" color={theme.colors.textSecondary} style={styles.emptyText}
->
+            <Text variant="md" color={theme.colors.textSecondary} style={styles.emptyText}>
               No employees found.
             </Text>
           }
         />
       </View>
     </ScreenContainer>
-    </RequireAdmin>
   );
 };
 
@@ -137,10 +156,20 @@ const styles = StyleSheet.create({
 flexOne: {
   flex: 1,
 },
-emptyText: {
-  textAlign: "center",
-  marginTop: theme.spacing.lg,
-},
+  emptyText: {
+    textAlign: "center",
+    marginTop: theme.spacing.lg,
+  },
+  emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: theme.spacing.xl,
+  },
+  inviteButton: {
+      marginLeft: theme.spacing.sm,
+      // Adjust height alignment if needed, usually Button has default height
+  }
 
 });
 

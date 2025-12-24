@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import OrgSelectScreen from "../screens/OrgSelectScreen";
 import CreateOrgScreen from "../screens/CreateOrgScreen";
 import JoinOrgScreen from "../screens/JoinOrgScreen";
+import { EmployeePendingApprovalScreen } from "../screens/EmployeePendingApprovalScreen";
 import { useRoleStore } from "@/store/roleStore";
 import { useOrgStore } from "@/store/orgStore";
 
@@ -25,7 +26,10 @@ const OrgNavigator = () => {
             <Stack.Screen name="CreateOrg" component={CreateOrgScreen} />
         </>
       ) : (
+        <>
         <Stack.Screen name="JoinOrg" component={JoinOrgScreen} />
+        <Stack.Screen name="EmployeePendingApproval" component={EmployeePendingApprovalScreen} />
+        </>
       )}
     </Stack.Navigator>
   );

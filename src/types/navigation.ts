@@ -12,6 +12,7 @@ export type OrgStackParamList = {
   OrgSelect: undefined;
   CreateOrg: undefined;
   JoinOrg: undefined;
+  EmployeePendingApproval: undefined;
 };
 
 export type DashboardStackParamList = {
@@ -31,6 +32,7 @@ export type DashboardStackParamList = {
   PayslipList: undefined;
   OrgSettings: undefined;
   ProfileSettings: undefined;
+  AdminJoinRequests: undefined;
 };
 
 export type EmployeeStackParamList = {

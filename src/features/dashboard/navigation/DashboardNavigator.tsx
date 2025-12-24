@@ -23,6 +23,9 @@ import ProfileSettingsScreen from "@/features/employee/screens/ProfileSettingsSc
 import PayrollListScreen from "@/features/payroll/screens/PayrollListScreen";
 import PayslipListScreen from "@/features/payroll/screens/PayslipListScreen";
 
+import CreateOrgScreen from "@/features/org/screens/CreateOrgScreen";
+import { AdminJoinRequestsScreen } from "@/features/org/screens/AdminJoinRequestsScreen";
+
 import { createStackNavigator } from "@react-navigation/stack";
 import { theme } from "@/ui/theme";
 
@@ -44,6 +47,7 @@ const DashboardNavigator = () => {
         <Stack.Screen name="PayrollRun" component={PayrollRunScreen} />
         <Stack.Screen name="OrgSettings" component={OrgSettingsScreen} />
         <Stack.Screen name="PayrollList" component={PayrollListScreen} />
+        <Stack.Screen name="AdminJoinRequests" component={AdminJoinRequestsScreen} />
       </Stack.Navigator>
     );
   }

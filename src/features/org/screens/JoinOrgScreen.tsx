@@ -7,7 +7,11 @@ import Card from '../../../ui/components/Card';
 import { useOrgStore } from '../../../store/orgStore';
 import { useAuthStore } from '../../../store/authStore';
 
-const JoinOrgScreen = () => {
+import { OrgScreenProps } from '@/types/navigation';
+
+type Props = OrgScreenProps<"JoinOrg">;
+
+const JoinOrgScreen: React.FC<Props> = ({ navigation }) => {
     const [orgCode, setOrgCode] = useState('');
     // We use store's loading state, but we also have local loading?
     // Store handles loading for join action. Use store's isLoading if we can expose it.
@@ -23,8 +27,8 @@ const JoinOrgScreen = () => {
         }
 
         await joinOrganization(orgCode);
-        // On success: Let root navigation proceed automatically (orgId set)
-        // On error: console.error only (handled in store)
+        // On success: Navigate to Pending Approval screen
+        navigation.navigate("EmployeePendingApproval");
     };
 
     return (
