@@ -51,7 +51,11 @@ const AdminDashboardScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.section}>
         <Text variant="lg" weight="bold" style={styles.sectionTitle}>Quick Actions</Text>
         <ResponsiveGrid>
-          <QuickActionCard title="View Employees" icon="people" onPress={() => navigation.navigate("Employees", { screen: "EmployeeList" })} />
+          <QuickActionCard 
+            title="Invite Employee" 
+            icon="person-add" 
+            onPress={() => navigation.navigate("OrgSettings")} 
+          />
           <QuickActionCard title="Approve Leave" icon="checkmark-circle" onPress={() => navigation.navigate("Leaves")} />
           <QuickActionCard title="Run Payroll" icon="cash" onPress={() => navigation.navigate("PayrollRun")} />
           <QuickActionCard title="Settings" icon="settings" onPress={() => navigation.navigate("OrgSettings")} />

@@ -15,7 +15,7 @@ import { OrgScreenProps } from "@/types/navigation";
 type Props = OrgScreenProps<"OrgSelect">;
 
 const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
-  const setOrg = useOrgStore((state) => state.setOrgId);
+  const setOrg = useOrgStore((state) => state.setOrg);
   const fetchOrganizations = useOrgStore((state) => state.fetchOrganizations);
   const organizations = useOrgStore((state) => state.organizations);
   const orgId = useOrgStore(state => state.orgId);
@@ -26,7 +26,7 @@ const OrgSelectScreen: React.FC<Props> = ({ navigation }) => {
   }, []);
 
   const handleSelect = (item: typeof organizations[0]) => {
-      setOrg(item?.id);
+      setOrg(item);
       // Root navigator will transition to Dashboard (via Role check? No, orgId check in Navigation.tsx)
   };
 

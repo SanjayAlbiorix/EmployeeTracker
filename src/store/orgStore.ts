@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { supabase } from "@/lib/supabaseClient";
 
-/* ============================================================
-   TYPES
-============================================================ */
-
 interface Organization {
   id: string;
   name: string;
@@ -15,71 +11,36 @@ interface OrgState {
   orgId: string | null;
   organizations: Organization[];
   isLoading: boolean;
+  orgHydrated: boolean;
 
-  setOrgId: (orgId: string) => void;
+  setOrg: (org: Organization) => void;
   clearOrg: () => void;
 
   fetchOrganizations: () => Promise<void>;
   createOrganization: (name: string) => Promise<void>;
   joinOrganization: (code: string) => Promise<void>;
+  hydrateOrganizationState: () => Promise<void>;
 }
 
-/* ============================================================
-   PERSISTENCE HELPERS (OUR METHOD)
-============================================================ */
-
-const ORG_STORAGE_KEY = "active_org_id";
-
-const loadOrgId = (): string | null => {
-  try {
-    return typeof window !== "undefined"
-      ? localStorage.getItem(ORG_STORAGE_KEY)
-      : null;
-  } catch {
-    return null;
-  }
-};
-
-const saveOrgId = (orgId: string | null) => {
-  try {
-    if (typeof window === "undefined") return;
-
-    if (orgId) {
-      localStorage.setItem(ORG_STORAGE_KEY, orgId);
-    } else {
-      localStorage.removeItem(ORG_STORAGE_KEY);
-    }
-  } catch {
-    // ignore storage errors
-  }
-};
-
-/* ============================================================
-   STORE
-============================================================ */
-
 export const useOrgStore = create<OrgState>((set) => ({
-  /* ================== STATE ================== */
-  orgId: loadOrgId(),
+  orgId: null,
   organizations: [],
   isLoading: false,
+  orgHydrated: false,
 
-  /* ================== BASIC ACTIONS ================== */
-  setOrgId: (orgId) => {
-    saveOrgId(orgId);
-    set({ orgId });
+  setOrg: (org) => {
+    set({ orgId: org.id });
   },
 
   clearOrg: () => {
-    saveOrgId(null);
     set({
       orgId: null,
       organizations: [],
+      orgHydrated: false,
       isLoading: false,
     });
   },
 
-  /* ================== FETCH ORGS ================== */
   fetchOrganizations: async () => {
     set({ isLoading: true });
 
@@ -93,7 +54,6 @@ export const useOrgStore = create<OrgState>((set) => ({
       return;
     }
 
-    // 🔥 HARD NORMALIZATION (MANDATORY)
     const orgs: Organization[] = Array.isArray(data)
       ? data
       : Array.isArray(data?.orgs)
@@ -106,7 +66,6 @@ export const useOrgStore = create<OrgState>((set) => ({
     });
   },
 
-  /* ================== CREATE ORG ================== */
   createOrganization: async (name: string) => {
     set({ isLoading: true });
 
@@ -138,16 +97,12 @@ export const useOrgStore = create<OrgState>((set) => ({
 
     const org = data as Organization;
 
-    // ✅ ONLY set orgId (navigation reacts)
-    saveOrgId(org.id);
-
     set({
       orgId: org.id,
       isLoading: false,
     });
   },
 
-  /* ================== JOIN ORG ================== */
   joinOrganization: async (code: string) => {
     set({ isLoading: true });
 
@@ -179,11 +134,40 @@ export const useOrgStore = create<OrgState>((set) => ({
 
     const org = data as Organization;
 
-    saveOrgId(org.id);
-
     set({
       orgId: org.id,
       isLoading: false,
     });
+  },
+
+  hydrateOrganizationState: async () => {
+    const { data, error } = await supabase.functions.invoke(
+      "get_my_organizations"
+    );
+
+    if (error) {
+      console.error("Error hydrating organizations:", error);
+      set({ orgHydrated: true });
+      return;
+    }
+
+    const orgs: Organization[] = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.orgs)
+      ? data.orgs
+      : [];
+
+    if (orgs.length === 1) {
+      set({
+        organizations: orgs,
+        orgId: orgs[0].id,
+        orgHydrated: true,
+      });
+    } else {
+      set({
+        organizations: orgs,
+        orgHydrated: true,
+      });
+    }
   },
 }));
