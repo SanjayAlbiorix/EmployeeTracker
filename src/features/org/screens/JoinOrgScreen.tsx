@@ -13,23 +13,48 @@ type Props = OrgScreenProps<"JoinOrg">;
 
 const JoinOrgScreen: React.FC<Props> = ({ navigation }) => {
     const [orgCode, setOrgCode] = useState('');
-    // We use store's loading state, but we also have local loading?
-    // Store handles loading for join action. Use store's isLoading if we can expose it.
-    // User instruction: "Replace mock logic... On submit: await joinOrganization(code)"
+    
     const joinOrganization = useOrgStore(state => state.joinOrganization);
     const isLoading = useOrgStore(state => state.isLoading);
+    const joinRequestStatus = useOrgStore(state => state.joinRequestStatus);
     const logout = useAuthStore(state => state.logout);
 
     const handleJoin = async () => {
+
+      
         if (!orgCode.trim()) {
             Alert.alert('Error', 'Please enter an organization code');
             return;
         }
 
         await joinOrganization(orgCode);
-        // On success: Navigate to Pending Approval screen
-        navigation.navigate("EmployeePendingApproval");
+        // Navigation is handled automatically by store state change in Navigation.tsx
     };
+
+    if (joinRequestStatus === 'pending') {
+        return (
+             <KeyboardAvoidingView 
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.container}
+            >
+                <View style={styles.content}>
+                    <Card style={styles.card}>
+                        <Text variant="xl" weight="bold" style={styles.title}>Approval Pending</Text>
+                        <Text variant="md" color={theme.colors.textSecondary} style={styles.subtitle}>
+                             Your request to join an organization has been sent and is awaiting approval.
+                        </Text>
+                        
+                         <Button 
+                            title="Log Out" 
+                            onPress={logout} 
+                            variant="outline"
+                            style={[styles.button, { marginTop: theme.spacing.md, borderColor: 'transparent' }]}
+                        />
+                    </Card>
+                </View>
+            </KeyboardAvoidingView>
+        );
+    }
 
     return (
         <KeyboardAvoidingView 
@@ -52,6 +77,7 @@ const JoinOrgScreen: React.FC<Props> = ({ navigation }) => {
                             placeholder="Enter code (e.g. 123456)"
                             placeholderTextColor={theme.colors.textSecondary}
                             autoCapitalize="characters"
+                            editable={!isLoading}
                         />
                     </View>
 
@@ -59,6 +85,7 @@ const JoinOrgScreen: React.FC<Props> = ({ navigation }) => {
                         title="Join Organization" 
                         onPress={handleJoin} 
                         loading={isLoading}
+                        disabled={isLoading}
                         variant="primary"
                         style={styles.button}
                     />
